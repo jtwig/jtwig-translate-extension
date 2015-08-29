@@ -13,6 +13,7 @@ import org.jtwig.translate.decorator.PluralSelector;
 import org.jtwig.value.JtwigValueFactory;
 import org.jtwig.value.configuration.ValueConfiguration;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import static java.util.Arrays.asList;
@@ -41,26 +42,26 @@ public class TranslateFunction {
     }
 
     @JtwigFunction(value = "translateChoice", aliases = {"transchoice"})
-    public String translateChoice (@Parameter("message") final String message, @Parameter("count") int count, @Parameter("replacements") Map replacements, @Parameter("locale") Locale locale) {
+    public String translateChoice (@Parameter("message") final String message, @Parameter("count") BigDecimal count, @Parameter("replacements") Map replacements, @Parameter("locale") Locale locale) {
         return new Translator(getEnvironment())
                 .translate(message, locale, asList(
-                        new PluralSelector(count),
+                        new PluralSelector(count.intValue()),
                         new ReplacementMessageDecorator(toReplacementCollection(replacements, getValueConfiguration()))
                 ));
     }
 
     @JtwigFunction(value = "translateChoice", aliases = {"transchoice"})
-    public String translateChoice (@Parameter("message") final String message, @Parameter("count") int count, @Parameter("replacements") Map replacements) {
+    public String translateChoice (@Parameter("message") final String message, @Parameter("count") BigDecimal count, @Parameter("replacements") Map replacements) {
         return translateChoice(message, count, replacements, getLocaleSupplier().get());
     }
 
     @JtwigFunction(value = "translateChoice", aliases = {"transchoice"})
-    public String translateChoice (@Parameter("message") final String message, @Parameter("count") int count) {
+    public String translateChoice (@Parameter("message") final String message, @Parameter("count") BigDecimal count) {
         return translateChoice(message, count, Collections.emptyMap(), getLocaleSupplier().get());
     }
 
     @JtwigFunction(value = "translateChoice", aliases = {"transchoice"})
-    public String translateChoice (@Parameter("message") final String message, @Parameter("count") int count, @Parameter("locale") Locale locale) {
+    public String translateChoice (@Parameter("message") final String message, @Parameter("count") BigDecimal count, @Parameter("locale") Locale locale) {
         return translateChoice(message, count, Collections.emptyMap(), locale);
     }
 
