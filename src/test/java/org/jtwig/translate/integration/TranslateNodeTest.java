@@ -4,6 +4,7 @@ import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
 import org.jtwig.i18n.source.message.MapMessageSource;
 import org.jtwig.translate.TranslateExtension;
+import org.jtwig.translate.configuration.DefaultTranslateConfiguration;
 import org.jtwig.translate.configuration.StaticLocaleSupplier;
 import org.jtwig.translate.configuration.TranslateConfigurationBuilder;
 import org.junit.Test;
@@ -19,7 +20,7 @@ public class TranslateNodeTest {
     @Test
     public void simpleTranslate() throws Exception {
         String result = JtwigTemplate.inlineTemplate("{% trans %}Hi{% endtrans %}", configuration()
-                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                         .build()))
                 .build())
                 .render(JtwigModel.newModel());
@@ -30,7 +31,7 @@ public class TranslateNodeTest {
     @Test
     public void simpleTranslateWithTranslation() throws Exception {
         String result = JtwigTemplate.inlineTemplate("{% trans %}Hi{% endtrans %}", configuration()
-                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                         .messages().withMessageSource(Locale.ITALY, singleMessageResource("Hi", "Ciao")).and()
                         .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ITALY))
                         .build()))
@@ -43,7 +44,7 @@ public class TranslateNodeTest {
     @Test
     public void simpleTranslateWithTranslationInto() throws Exception {
         String result = JtwigTemplate.inlineTemplate("{% trans into 'it-IT' %}Hi{% endtrans %}", configuration()
-                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                         .messages().withMessageSource(Locale.ITALY, singleMessageResource("Hi", "Ciao")).and()
                         .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ENGLISH))
                         .build()))
@@ -56,7 +57,7 @@ public class TranslateNodeTest {
     @Test
     public void simpleTranslateWithTranslationWithParameter() throws Exception {
         String result = JtwigTemplate.inlineTemplate("{% trans with { '%name%': 'Joao' } %}Hi %name%{% endtrans %}", configuration()
-                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                         .messages().withMessageSource(Locale.ITALY, singleMessageResource("Hi %name%", "Ciao %name%")).and()
                         .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ITALY))
                         .build()))
@@ -69,7 +70,7 @@ public class TranslateNodeTest {
     @Test
     public void translateWithTranslationWithContextVariable() throws Exception {
         String result = JtwigTemplate.inlineTemplate("{% trans %}Hi %name%{% endtrans %}", configuration()
-                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                         .messages().withMessageSource(Locale.ITALY, singleMessageResource("Hi %name%", "Ciao %name%")).and()
                         .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ITALY))
                         .build()))

@@ -44,7 +44,15 @@ public class TranslateConfiguration {
         return environmentConfigurationBuilder;
     }
 
-    public MessageResolverConfiguration messageResolverConfiguration() {
+    public MessageResolverConfiguration getConfiguration() {
         return configuration;
+    }
+
+    public Supplier<Locale> getLocaleSupplier() {
+        return localeSupplier;
+    }
+
+    public LocaleResolver getLocaleResolver() {
+        return localeResolver;
     }
 }
