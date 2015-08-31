@@ -2,6 +2,7 @@ package org.jtwig.translate.integration;
 
 import org.jtwig.i18n.source.message.MapMessageSource;
 import org.jtwig.translate.TranslateExtension;
+import org.jtwig.translate.configuration.DefaultTranslateConfiguration;
 import org.jtwig.translate.configuration.StaticLocaleSupplier;
 import org.jtwig.translate.configuration.TranslateConfigurationBuilder;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class TranslateChoiceFunctionTest {
     public void translateSimple() throws Exception {
         String result =
                 inlineTemplate("{{ 'Hi' | translateChoice(1) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .build())).build())
                         .render(newModel());
 
@@ -32,7 +33,7 @@ public class TranslateChoiceFunctionTest {
     public void translateWithChoiceOne() throws Exception {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(1) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .build())).build())
                         .render(newModel());
 
@@ -43,7 +44,7 @@ public class TranslateChoiceFunctionTest {
     public void translateWithChoiceZero() throws Exception {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(0) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .build())).build())
                         .render(newModel());
 
@@ -54,7 +55,7 @@ public class TranslateChoiceFunctionTest {
     public void translateWithChoiceMulti() throws Exception {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(2) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .build())).build())
                         .render(newModel());
 
@@ -65,7 +66,7 @@ public class TranslateChoiceFunctionTest {
     public void translateWithTranslation() throws Exception {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(1) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .messages().withMessageSource(Locale.ITALY, singleMessageSource("{0} Zero | {1} One | ]1, Inf[ Multi", "{0} Zero | [1, Inf[ Varios")).and()
                                 .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ITALY))
                                 .build()))
@@ -79,7 +80,7 @@ public class TranslateChoiceFunctionTest {
     public void translateWithTranslationAndLocale() throws Exception {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(3, 'it-IT') }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .messages().withMessageSource(Locale.ITALY, singleMessageSource("{0} Zero | {1} One | ]1, Inf[ Multi", "{0} Zero | [1, Inf[ Varios")).and()
                                 .build()))
                         .build())
@@ -92,7 +93,7 @@ public class TranslateChoiceFunctionTest {
     public void translateWithTranslationAndLocaleAndReplacements() throws Exception {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(3, {'%name%': 'Joao'},'it-IT') }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .messages().withMessageSource(Locale.ITALY, singleMessageSource("{0} Zero | {1} One | ]1, Inf[ Multi", "{0} Zero | [1, Inf[ Varios %name%")).and()
                                 .build()))
                         .build())

@@ -2,22 +2,23 @@ package org.jtwig.translate.configuration;
 
 import com.google.common.base.Supplier;
 import org.apache.commons.lang3.builder.Builder;
-import org.jtwig.i18n.locale.JavaLocaleResolver;
 import org.jtwig.i18n.locale.LocaleResolver;
 
 import java.util.Locale;
 
 public class TranslateConfigurationBuilder implements Builder<TranslateConfiguration> {
     private final AndMessageResolverConfigurationBuilder messageResolverConfigurationBuilder;
-    private Supplier<Locale> localeSupplier = new StaticLocaleSupplier(Locale.ENGLISH);
-    private LocaleResolver localeResolver = new JavaLocaleResolver();
+    private Supplier<Locale> localeSupplier;
+    private LocaleResolver localeResolver;
 
     public TranslateConfigurationBuilder() {
         this.messageResolverConfigurationBuilder = new AndMessageResolverConfigurationBuilder(this);
     }
 
     public TranslateConfigurationBuilder(TranslateConfiguration prototype) {
-        this.messageResolverConfigurationBuilder = new AndMessageResolverConfigurationBuilder(prototype.messageResolverConfiguration(), this);
+        this.localeResolver = prototype.getLocaleResolver();
+        this.localeSupplier = prototype.getLocaleSupplier();
+        this.messageResolverConfigurationBuilder = new AndMessageResolverConfigurationBuilder(prototype.getConfiguration(), this);
     }
 
     public TranslateConfigurationBuilder withCurrentLocaleSupplier (Supplier<Locale> supplier) {

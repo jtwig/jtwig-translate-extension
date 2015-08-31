@@ -2,6 +2,7 @@ package org.jtwig.translate.integration;
 
 import org.jtwig.i18n.source.message.MapMessageSource;
 import org.jtwig.translate.TranslateExtension;
+import org.jtwig.translate.configuration.DefaultTranslateConfiguration;
 import org.jtwig.translate.configuration.StaticLocaleSupplier;
 import org.jtwig.translate.configuration.TranslateConfigurationBuilder;
 import org.junit.Test;
@@ -20,7 +21,7 @@ public class TranslateFunctionTest {
     public void translateSimple() throws Exception {
         String result =
                 inlineTemplate("{{ 'Hi' | translate }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder().build()))
+                        .withExtension(new TranslateExtension(new DefaultTranslateConfiguration()))
                         .build())
                         .render(newModel());
 
@@ -33,7 +34,7 @@ public class TranslateFunctionTest {
 
         String result =
                 inlineTemplate("{{ 'Hi' | translate }}", configuration()
-                                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                         .messages().withMessageSource(current, singleEntryMap("Hi", "Ciao")).and()
                                         .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
                                         .build()))
@@ -49,7 +50,7 @@ public class TranslateFunctionTest {
 
         String result =
                 inlineTemplate("{{ 'Hi %name%' | translate({ '%name%': 'Joao' }) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .messages().withMessageSource(current, singleEntryMap("Hi %name%", "Ciao %name%")).and()
                                 .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
                                 .build())).build())
@@ -64,7 +65,7 @@ public class TranslateFunctionTest {
 
         String result =
                 inlineTemplate("{{ 'Hi %name%' | translate({ '%name%': 'Joao' }, 'pt') }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .messages().withMessageSource(current, singleEntryMap("Hi %name%", "Ciao %name%"))
                                 .withMessageSource(Locale.forLanguageTag("pt"), singleEntryMap("Hi %name%", "Ola %name%"))
                                 .and()
@@ -82,7 +83,7 @@ public class TranslateFunctionTest {
 
         String result =
                 inlineTemplate("{{ 'Hello' | translate('pt') }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder()
+                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .messages().withMessageSource(current, singleEntryMap("Hello", "Ciao"))
                                         .withMessageSource(Locale.forLanguageTag("pt"), singleEntryMap("Hello", "Ola"))
                                         .and()
