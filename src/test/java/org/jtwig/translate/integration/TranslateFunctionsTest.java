@@ -16,7 +16,7 @@ import static org.jtwig.JtwigModel.newModel;
 import static org.jtwig.JtwigTemplate.inlineTemplate;
 import static org.jtwig.environment.EnvironmentConfigurationBuilder.configuration;
 
-public class TranslateFunctionTest {
+public class TranslateFunctionsTest {
     @Test
     public void translateSimple() throws Exception {
         String result =
