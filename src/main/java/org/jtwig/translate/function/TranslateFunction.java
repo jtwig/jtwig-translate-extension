@@ -10,7 +10,7 @@ import org.jtwig.i18n.decorate.MessageDecorator;
 import org.jtwig.i18n.decorate.ReplacementMessageDecorator;
 import org.jtwig.translate.configuration.TranslateConfiguration;
 import org.jtwig.value.JtwigValueFactory;
-import org.jtwig.value.configuration.ValueConfiguration;
+import org.jtwig.value.environment.ValueEnvironment;
 
 import java.util.*;
 
@@ -57,8 +57,8 @@ public class TranslateFunction implements JtwigFunction {
     protected RenderContext getRenderContext() {
         return RenderContextHolder.get();
     }
-    private ValueConfiguration getValueConfiguration() {
-        return getRenderContext().environment().valueConfiguration();
+    private ValueEnvironment getValueConfiguration() {
+        return getRenderContext().environment().value();
     }
     private Environment getEnvironment() {
         return getRenderContext().environment();
@@ -67,12 +67,12 @@ public class TranslateFunction implements JtwigFunction {
         return TranslateConfiguration.currentLocaleSupplier(getRenderContext().environment());
     }
 
-    private Collection<ReplacementMessageDecorator.Replacement> toReplacementCollection(Map<Object, Object> replacements, ValueConfiguration valueConfiguration) {
+    private Collection<ReplacementMessageDecorator.Replacement> toReplacementCollection(Map<Object, Object> replacements, ValueEnvironment valueEnvironment) {
         Collection<ReplacementMessageDecorator.Replacement> result = new ArrayList<>();
         for (Map.Entry<Object, Object> entry : replacements.entrySet()) {
             if (entry.getKey() != null) {
                 String key = entry.getKey().toString();
-                String stringValue = JtwigValueFactory.value(entry.getValue(), valueConfiguration).asString();
+                String stringValue = JtwigValueFactory.value(entry.getValue(), valueEnvironment).asString();
                 result.add(new ReplacementMessageDecorator.Replacement(key, stringValue));
             }
         }
