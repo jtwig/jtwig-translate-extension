@@ -30,9 +30,9 @@ buildscript {
 
 
 dependencies {
-    compile 'org.jtwig:jtwig-core:5.+'
-    compile 'org.jtwig:jtwig-i18n:1.+'
-    compile 'org.jtwig:jtwig-pluralization:1.+'
+    compile 'org.jtwig:jtwig-core:5.20'
+    compile 'org.jtwig:jtwig-i18n:1.11'
+    compile 'org.jtwig:jtwig-pluralization:1.5'
 
     compile 'com.google.guava:guava:18.0'
     compile 'org.apache.commons:commons-lang3:3.1'
