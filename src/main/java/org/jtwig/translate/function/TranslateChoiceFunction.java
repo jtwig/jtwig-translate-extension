@@ -10,7 +10,7 @@ import org.jtwig.i18n.decorate.ReplacementMessageDecorator;
 import org.jtwig.translate.configuration.TranslateConfiguration;
 import org.jtwig.translate.decorator.PluralSelector;
 import org.jtwig.value.JtwigValueFactory;
-import org.jtwig.value.configuration.ValueConfiguration;
+import org.jtwig.value.environment.ValueEnvironment;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -68,16 +68,16 @@ public class TranslateChoiceFunction implements JtwigFunction {
         return getRenderContext().environment();
     }
 
-    private ValueConfiguration getValueConfiguration() {
-        return getRenderContext().environment().valueConfiguration();
+    private ValueEnvironment getValueConfiguration() {
+        return getRenderContext().environment().value();
     }
 
-    private Collection<ReplacementMessageDecorator.Replacement> toReplacementCollection(Map<Object, Object> replacements, ValueConfiguration valueConfiguration) {
+    private Collection<ReplacementMessageDecorator.Replacement> toReplacementCollection(Map<Object, Object> replacements, ValueEnvironment valueEnvironment) {
         Collection<ReplacementMessageDecorator.Replacement> result = new ArrayList<>();
         for (Map.Entry<Object, Object> entry : replacements.entrySet()) {
             if (entry.getKey() != null) {
                 String key = entry.getKey().toString();
-                String stringValue = JtwigValueFactory.value(entry.getValue(), valueConfiguration).asString();
+                String stringValue = JtwigValueFactory.value(entry.getValue(), valueEnvironment).asString();
                 result.add(new ReplacementMessageDecorator.Replacement(key, stringValue));
             }
         }

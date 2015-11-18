@@ -19,7 +19,7 @@ import org.jtwig.render.impl.StringRenderable;
 import org.jtwig.translate.configuration.TranslateConfiguration;
 import org.jtwig.value.JtwigValue;
 import org.jtwig.value.JtwigValueFactory;
-import org.jtwig.value.configuration.ValueConfiguration;
+import org.jtwig.value.environment.ValueEnvironment;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,11 +57,11 @@ public class TranslateNode extends ContentNode {
 
         Collection<MessageDecorator> decorators = new ArrayList<>();
 
-        ValueConfiguration valueConfiguration = context.environment().valueConfiguration();
+        ValueEnvironment valueEnvironment = context.environment().value();
         if (withExpression.isPresent()) {
-            decorators.add(new ReplacementMessageDecorator(toReplacements(withExpression.get().calculate(context).asMap(), valueConfiguration)));
+            decorators.add(new ReplacementMessageDecorator(toReplacements(withExpression.get().calculate(context).asMap(), valueEnvironment)));
         }
-        decorators.add(new ExpressionMessageDecorator(fromContextValue(context.valueContext(), valueConfiguration)));
+        decorators.add(new ExpressionMessageDecorator(fromContextValue(context.valueContext(), valueEnvironment)));
 
         CompositeMessageDecorator messageDecorator = new CompositeMessageDecorator(decorators);
         return new StringRenderable(TranslateConfiguration.messageResolver(context.environment())
@@ -69,19 +69,19 @@ public class TranslateNode extends ContentNode {
                 .or(defaultMessage(message, messageDecorator)), context.escapeContext().currentEscapeMode());
     }
 
-    private Collection<ReplacementMessageDecorator.Replacement> toReplacements(Map<Object, Object> objectObjectMap, ValueConfiguration valueConfiguration) {
+    private Collection<ReplacementMessageDecorator.Replacement> toReplacements(Map<Object, Object> objectObjectMap, ValueEnvironment valueEnvironment) {
         Collection<ReplacementMessageDecorator.Replacement> result = new ArrayList<>();
         for (Map.Entry<Object, Object> entry : objectObjectMap.entrySet()) {
             Object key = entry.getKey();
             if (key != null) {
-                String replace = JtwigValueFactory.value(entry.getValue(), valueConfiguration).asString();
+                String replace = JtwigValueFactory.value(entry.getValue(), valueEnvironment).asString();
                 result.add(new ReplacementMessageDecorator.Replacement(key.toString(), replace));
             }
         }
         return result;
     }
 
-    private ExpressionMessageDecorator.ReplacementFinder fromContextValue(final ValueContext valueContext, final ValueConfiguration configuration) {
+    private ExpressionMessageDecorator.ReplacementFinder fromContextValue(final ValueContext valueContext, final ValueEnvironment configuration) {
         return new ExpressionMessageDecorator.ReplacementFinder() {
             @Override
             public String replacementFor(String key) {
