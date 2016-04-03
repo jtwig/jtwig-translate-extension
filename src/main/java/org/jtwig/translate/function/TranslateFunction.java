@@ -3,6 +3,7 @@ package org.jtwig.translate.function;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import org.jtwig.environment.Environment;
+import org.jtwig.exceptions.CalculationException;
 import org.jtwig.functions.FunctionRequest;
 import org.jtwig.functions.JtwigFunction;
 import org.jtwig.i18n.decorate.MessageDecorator;
@@ -10,6 +11,7 @@ import org.jtwig.i18n.decorate.ReplacementMessageDecorator;
 import org.jtwig.translate.configuration.TranslateConfiguration;
 import org.jtwig.translate.function.extract.LocaleExtractor;
 import org.jtwig.translate.function.extract.ReplacementsExtractor;
+import org.jtwig.util.ErrorMessageFormatter;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -51,16 +53,22 @@ public class TranslateFunction implements JtwigFunction {
                 Optional<Collection<ReplacementMessageDecorator.Replacement>> collectionOptional = replacementsExtractor.extract(request.getEnvironment(), request.get(1));
                 if (collectionOptional.isPresent()) {
                     replacements = collectionOptional.get();
+                } else {
+                    throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map or locale as second argument, but got '%s'", request.get(1))));
                 }
             }
         } else if (request.getNumberOfArguments() == 3) {
             Optional<Collection<ReplacementMessageDecorator.Replacement>> collectionOptional = replacementsExtractor.extract(request.getEnvironment(), request.get(1));
             if (collectionOptional.isPresent()) {
                 replacements = collectionOptional.get();
+            } else {
+                throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map as second argument, but got '%s'", request.get(1))));
             }
             Optional<Locale> localeExtract = localeExtractor.extract(request.getEnvironment(), request.get(2));
             if (localeExtract.isPresent()) {
                 locale = localeExtract.get();
+            } else {
+                throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting locale as third argument, but got '%s'", request.get(2))));
             }
         }
 

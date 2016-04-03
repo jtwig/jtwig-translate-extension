@@ -3,6 +3,7 @@ package org.jtwig.translate.function;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import org.jtwig.environment.Environment;
+import org.jtwig.exceptions.CalculationException;
 import org.jtwig.functions.FunctionRequest;
 import org.jtwig.functions.JtwigFunction;
 import org.jtwig.i18n.decorate.ReplacementMessageDecorator;
@@ -10,6 +11,7 @@ import org.jtwig.translate.configuration.TranslateConfiguration;
 import org.jtwig.translate.decorator.PluralSelector;
 import org.jtwig.translate.function.extract.LocaleExtractor;
 import org.jtwig.translate.function.extract.ReplacementsExtractor;
+import org.jtwig.util.ErrorMessageFormatter;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -41,7 +43,8 @@ public class TranslateChoiceFunction implements JtwigFunction {
     public Object execute(FunctionRequest request) {
         request.minimumNumberOfArguments(2).maximumNumberOfArguments(4);
         String message = request.getEnvironment().getValueEnvironment().getStringConverter().convert(request.get(0));
-        BigDecimal count = request.getEnvironment().getValueEnvironment().getNumberConverter().convert(request.get(1)).or(BigDecimal.ZERO);
+        BigDecimal count = request.getEnvironment().getValueEnvironment().getNumberConverter().convert(request.get(1))
+                .orThrow(request.getPosition(), String.format("Expecting number as second argument but got '%s'", request.get(1)));
         Collection<ReplacementMessageDecorator.Replacement> replacements = Collections.emptyList();
         Locale locale = getLocaleSupplier(request.getEnvironment()).get();
 
@@ -53,16 +56,22 @@ public class TranslateChoiceFunction implements JtwigFunction {
                 Optional<Collection<ReplacementMessageDecorator.Replacement>> collectionOptional = replacementsExtractor.extract(request.getEnvironment(), request.get(2));
                 if (collectionOptional.isPresent()) {
                     replacements = collectionOptional.get();
+                } else {
+                    throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map or locale as third argument, but got '%s'", request.get(2))));
                 }
             }
         } else if (request.getNumberOfArguments() == 4) {
             Optional<Collection<ReplacementMessageDecorator.Replacement>> collectionOptional = replacementsExtractor.extract(request.getEnvironment(), request.get(2));
             if (collectionOptional.isPresent()) {
                 replacements = collectionOptional.get();
+            } else {
+                throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map as third argument, but got '%s'", request.get(2))));
             }
             Optional<Locale> localeExtract = localeExtractor.extract(request.getEnvironment(), request.get(3));
             if (localeExtract.isPresent()) {
                 locale = localeExtract.get();
+            } else {
+                throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting locale as fourth argument, but got '%s'", request.get(3))));
             }
         }
 
