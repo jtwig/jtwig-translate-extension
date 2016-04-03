@@ -9,6 +9,8 @@ import java.util.Locale;
 
 public class DefaultTranslateConfiguration extends TranslateConfiguration {
     public DefaultTranslateConfiguration() {
-        super(new MessageResolverConfiguration(Collections.<LocalizedMessageSource>emptyList()), new StaticLocaleSupplier(Locale.ENGLISH), new JavaLocaleResolver());
+        super(new MessageResolverConfiguration(Collections.<LocalizedMessageSource>emptyList()),
+                new StaticLocaleSupplier(Locale.ENGLISH),
+                new JavaLocaleResolver());
     }
 }
