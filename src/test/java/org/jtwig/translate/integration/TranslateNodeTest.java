@@ -7,16 +7,22 @@ import org.jtwig.translate.TranslateExtension;
 import org.jtwig.translate.configuration.DefaultTranslateConfiguration;
 import org.jtwig.translate.configuration.StaticLocaleSupplier;
 import org.jtwig.translate.configuration.TranslateConfigurationBuilder;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.HashMap;
 import java.util.Locale;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.jtwig.environment.EnvironmentConfigurationBuilder.configuration;
 
 public class TranslateNodeTest {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Test
     public void simpleTranslate() throws Exception {
         String result = JtwigTemplate.inlineTemplate("{% trans %}Hi{% endtrans %}", configuration()
@@ -55,6 +61,19 @@ public class TranslateNodeTest {
     }
 
     @Test
+    public void simpleTranslateWithTranslationIntoInvalid() throws Exception {
+        expectedException.expectMessage(containsString("Unable to convert '1' to locale"));
+
+        JtwigTemplate.inlineTemplate("{% trans into 1 %}Hi{% endtrans %}", configuration()
+                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .messages().withMessageSource(Locale.ITALY, singleMessageResource("Hi", "Ciao")).and()
+                        .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ENGLISH))
+                        .build()))
+                .build())
+                .render(JtwigModel.newModel());
+    }
+
+    @Test
     public void simpleTranslateWithTranslationWithParameter() throws Exception {
         String result = JtwigTemplate.inlineTemplate("{% trans with { '%name%': 'Joao' } %}Hi %name%{% endtrans %}", configuration()
                 .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
@@ -65,6 +84,19 @@ public class TranslateNodeTest {
                 .render(JtwigModel.newModel());
 
         assertThat(result, is("Ciao Joao"));
+    }
+
+    @Test
+    public void simpleTranslateWithTranslationWithParameterInvalid() throws Exception {
+        expectedException.expectMessage(containsString("Unable to convert '1' to replacements"));
+
+        JtwigTemplate.inlineTemplate("{% trans with 1 %}Hi %name%{% endtrans %}", configuration()
+                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .messages().withMessageSource(Locale.ITALY, singleMessageResource("Hi %name%", "Ciao %name%")).and()
+                        .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ITALY))
+                        .build()))
+                .build())
+                .render(JtwigModel.newModel());
     }
 
     @Test

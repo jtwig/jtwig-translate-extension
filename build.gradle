@@ -24,13 +24,13 @@ buildscript {
 
     dependencies {
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.0.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.3.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
     }
 }
 
 
 dependencies {
-    compile 'org.jtwig:jtwig-core:5.21'
+    compile 'org.jtwig:jtwig-core:5.23'
     compile 'org.jtwig:jtwig-i18n:1.11'
     compile 'org.jtwig:jtwig-pluralization:1.5'
 

@@ -1,23 +1,34 @@
 package org.jtwig.translate.function;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
-import org.jtwig.context.RenderContext;
-import org.jtwig.context.RenderContextHolder;
 import org.jtwig.environment.Environment;
+import org.jtwig.exceptions.CalculationException;
+import org.jtwig.functions.FunctionRequest;
 import org.jtwig.functions.JtwigFunction;
-import org.jtwig.functions.JtwigFunctionRequest;
 import org.jtwig.i18n.decorate.ReplacementMessageDecorator;
 import org.jtwig.translate.configuration.TranslateConfiguration;
 import org.jtwig.translate.decorator.PluralSelector;
-import org.jtwig.value.JtwigValueFactory;
-import org.jtwig.value.environment.ValueEnvironment;
+import org.jtwig.translate.function.extract.LocaleExtractor;
+import org.jtwig.translate.function.extract.ReplacementsExtractor;
+import org.jtwig.util.ErrorMessageFormatter;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Locale;
 
 import static java.util.Arrays.asList;
 
 public class TranslateChoiceFunction implements JtwigFunction {
+    private final LocaleExtractor localeExtractor;
+    private final ReplacementsExtractor replacementsExtractor;
+
+    public TranslateChoiceFunction(LocaleExtractor localeExtractor, ReplacementsExtractor replacementsExtractor) {
+        this.localeExtractor = localeExtractor;
+        this.replacementsExtractor = replacementsExtractor;
+    }
+
     @Override
     public String name() {
         return "translateChoice";
@@ -29,62 +40,49 @@ public class TranslateChoiceFunction implements JtwigFunction {
     }
 
     @Override
-    public Object execute(JtwigFunctionRequest request) {
+    public Object execute(FunctionRequest request) {
         request.minimumNumberOfArguments(2).maximumNumberOfArguments(4);
-        String message = request.getArgument(0, String.class);
-        BigDecimal count = request.getArgument(1, BigDecimal.class);
-        Map<Object, Object> replacements = Collections.emptyMap();
-        Locale locale = getLocaleSupplier().get();
+        String message = request.getEnvironment().getValueEnvironment().getStringConverter().convert(request.get(0));
+        BigDecimal count = request.getEnvironment().getValueEnvironment().getNumberConverter().convert(request.get(1))
+                .orThrow(request.getPosition(), String.format("Expecting number as second argument but got '%s'", request.get(1)));
+        Collection<ReplacementMessageDecorator.Replacement> replacements = Collections.emptyList();
+        Locale locale = getLocaleSupplier(request.getEnvironment()).get();
 
         if (request.getNumberOfArguments() == 3) {
-            if (request.get(2).as(Map.class).isPresent()) {
-                replacements = request.getArgument(2, Map.class);
+            Optional<Locale> localeExtract = localeExtractor.extract(request.getEnvironment(), request.get(2));
+            if (localeExtract.isPresent()) {
+                locale = localeExtract.get();
             } else {
-                locale = request.getArgument(2, Locale.class);
+                Optional<Collection<ReplacementMessageDecorator.Replacement>> collectionOptional = replacementsExtractor.extract(request.getEnvironment(), request.get(2));
+                if (collectionOptional.isPresent()) {
+                    replacements = collectionOptional.get();
+                } else {
+                    throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map or locale as third argument, but got '%s'", request.get(2))));
+                }
             }
         } else if (request.getNumberOfArguments() == 4) {
-            replacements = request.getArgument(2, Map.class);
-            locale = request.getArgument(3, Locale.class);
+            Optional<Collection<ReplacementMessageDecorator.Replacement>> collectionOptional = replacementsExtractor.extract(request.getEnvironment(), request.get(2));
+            if (collectionOptional.isPresent()) {
+                replacements = collectionOptional.get();
+            } else {
+                throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map as third argument, but got '%s'", request.get(2))));
+            }
+            Optional<Locale> localeExtract = localeExtractor.extract(request.getEnvironment(), request.get(3));
+            if (localeExtract.isPresent()) {
+                locale = localeExtract.get();
+            } else {
+                throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting locale as fourth argument, but got '%s'", request.get(3))));
+            }
         }
 
-        return translateChoice(message, count, replacements, locale);
-    }
-
-
-
-    public String translateChoice (String message, BigDecimal count, Map replacements, Locale locale) {
-        return new Translator(getEnvironment())
+        return new Translator(request.getEnvironment())
                 .translate(message, locale, asList(
-                        new PluralSelector(count.intValue()),
-                        new ReplacementMessageDecorator(toReplacementCollection(replacements, getValueConfiguration()))
+                        new PluralSelector(request.getPosition(), count.intValue()),
+                        new ReplacementMessageDecorator(replacements)
                 ));
     }
 
-    private Supplier<Locale> getLocaleSupplier() {
-        return TranslateConfiguration.currentLocaleSupplier(getRenderContext().environment());
-    }
-
-    private Environment getEnvironment() {
-        return getRenderContext().environment();
-    }
-
-    private ValueEnvironment getValueConfiguration() {
-        return getRenderContext().environment().value();
-    }
-
-    private Collection<ReplacementMessageDecorator.Replacement> toReplacementCollection(Map<Object, Object> replacements, ValueEnvironment valueEnvironment) {
-        Collection<ReplacementMessageDecorator.Replacement> result = new ArrayList<>();
-        for (Map.Entry<Object, Object> entry : replacements.entrySet()) {
-            if (entry.getKey() != null) {
-                String key = entry.getKey().toString();
-                String stringValue = JtwigValueFactory.value(entry.getValue(), valueEnvironment).asString();
-                result.add(new ReplacementMessageDecorator.Replacement(key, stringValue));
-            }
-        }
-        return result;
-    }
-
-    protected RenderContext getRenderContext() {
-        return RenderContextHolder.get();
+    private Supplier<Locale> getLocaleSupplier(Environment environment) {
+        return TranslateConfiguration.currentLocaleSupplier(environment);
     }
 }
