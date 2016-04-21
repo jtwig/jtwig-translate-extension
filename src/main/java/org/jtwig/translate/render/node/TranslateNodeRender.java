@@ -70,7 +70,7 @@ public class TranslateNodeRender implements NodeRender<TranslateNode> {
         CompositeMessageDecorator messageDecorator = new CompositeMessageDecorator(decorators);
         return new StringRenderable(TranslateConfiguration.messageResolver(request.getEnvironment())
                 .resolve(locale, message, messageDecorator)
-                .or(defaultMessage(message, messageDecorator)), request.getRenderContext().getEscapeModeContext().getCurrent());
+                .or(defaultMessage(message, messageDecorator)), request.getRenderContext().getEscapeEngineContext().getCurrent());
     }
 
 

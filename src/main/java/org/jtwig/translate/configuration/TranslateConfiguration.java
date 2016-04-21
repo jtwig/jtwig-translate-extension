@@ -38,9 +38,10 @@ public class TranslateConfiguration {
 
     public EnvironmentConfigurationBuilder registerParameters(EnvironmentConfigurationBuilder environmentConfigurationBuilder) {
         MessageResolver messageResolver = new MessageResolverFactory().create(configuration);
-        environmentConfigurationBuilder.withParameter(MESSAGE_RESOLVER, messageResolver);
-        environmentConfigurationBuilder.withParameter(LOCALE_SUPPLIER, localeSupplier);
-        environmentConfigurationBuilder.withParameter(LOCALE_RESOLVER, localeResolver);
+        environmentConfigurationBuilder.parameters()
+                .add(MESSAGE_RESOLVER, messageResolver)
+                .add(LOCALE_SUPPLIER, localeSupplier)
+                .add(LOCALE_RESOLVER, localeResolver);
         return environmentConfigurationBuilder;
     }
 

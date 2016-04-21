@@ -27,8 +27,8 @@ public class TranslateChoiceFunctionTest {
     public void translateSimple() throws Exception {
         String result =
                 inlineTemplate("{{ 'Hi' | translateChoice(1) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                .build())).build())
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                                .build())).and().build())
                         .render(newModel());
 
         assertThat(result, is("Hi"));
@@ -39,8 +39,8 @@ public class TranslateChoiceFunctionTest {
         expectedException.expectMessage(containsString("Expecting number as second argument but got 'a'"));
 
         inlineTemplate("{{ 'Hi' | translateChoice('a') }}", configuration()
-                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                        .build())).build())
+                .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .build())).and().build())
                 .render(newModel());
     }
 
@@ -49,8 +49,8 @@ public class TranslateChoiceFunctionTest {
         expectedException.expectMessage(containsString("Expecting map or locale as third argument, but got '1'"));
 
         inlineTemplate("{{ 'Hi' | translateChoice(0, 1) }}", configuration()
-                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                        .build())).build())
+                .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .build())).and().build())
                 .render(newModel());
     }
 
@@ -59,8 +59,8 @@ public class TranslateChoiceFunctionTest {
         expectedException.expectMessage(containsString("Expecting map as third argument, but got '1'"));
 
         inlineTemplate("{{ 'Hi' | translateChoice(0, 1, 2) }}", configuration()
-                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                        .build())).build())
+                .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .build())).and().build())
                 .render(newModel());
     }
 
@@ -69,16 +69,16 @@ public class TranslateChoiceFunctionTest {
         expectedException.expectMessage(containsString("Expecting locale as fourth argument, but got '2'"));
 
         inlineTemplate("{{ 'Hi' | translateChoice(0, {}, 2) }}", configuration()
-                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                        .build())).build())
+                .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .build())).and().build())
                 .render(newModel());
     }
 
     @Test
     public void translateSimpleWithMap() throws Exception {
         String result = inlineTemplate("{{ 'Hi %name%' | translateChoice(0, {'%name%':'Jtwig'}) }}", configuration()
-                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                        .build())).build())
+                .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .build())).and().build())
                 .render(newModel());
 
         assertThat(result, is("Hi Jtwig"));
@@ -88,8 +88,8 @@ public class TranslateChoiceFunctionTest {
     public void translateWithChoiceOne() throws Exception {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(1) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                .build())).build())
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                                .build())).and().build())
                         .render(newModel());
 
         assertThat(result, is("One"));
@@ -99,8 +99,8 @@ public class TranslateChoiceFunctionTest {
     public void translateWithChoiceZero() throws Exception {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(0) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                .build())).build())
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                                .build())).and().build())
                         .render(newModel());
 
         assertThat(result, is("Zero"));
@@ -110,8 +110,8 @@ public class TranslateChoiceFunctionTest {
     public void translateWithChoiceMulti() throws Exception {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(2) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                .build())).build())
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                                .build())).and().build())
                         .render(newModel());
 
         assertThat(result, is("Multi"));
@@ -121,10 +121,10 @@ public class TranslateChoiceFunctionTest {
     public void translateWithTranslation() throws Exception {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(1) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .messages().withMessageSource(Locale.ITALY, singleMessageSource("{0} Zero | {1} One | ]1, Inf[ Multi", "{0} Zero | [1, Inf[ Varios")).and()
                                 .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ITALY))
-                                .build()))
+                                .build())).and()
                         .build())
                         .render(newModel());
 
@@ -135,9 +135,9 @@ public class TranslateChoiceFunctionTest {
     public void translateWithTranslationAndLocale() throws Exception {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(3, 'it-IT') }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .messages().withMessageSource(Locale.ITALY, singleMessageSource("{0} Zero | {1} One | ]1, Inf[ Multi", "{0} Zero | [1, Inf[ Varios")).and()
-                                .build()))
+                                .build())).and()
                         .build())
                         .render(newModel());
 
@@ -148,9 +148,9 @@ public class TranslateChoiceFunctionTest {
     public void translateWithTranslationAndLocaleAndReplacements() throws Exception {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(3, {'%name%': 'Joao'},'it-IT') }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .messages().withMessageSource(Locale.ITALY, singleMessageSource("{0} Zero | {1} One | ]1, Inf[ Multi", "{0} Zero | [1, Inf[ Varios %name%")).and()
-                                .build()))
+                                .build())).and()
                         .build())
                         .render(newModel());
 

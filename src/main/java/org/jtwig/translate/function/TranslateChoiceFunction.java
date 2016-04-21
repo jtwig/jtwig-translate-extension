@@ -1,32 +1,22 @@
 package org.jtwig.translate.function;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Supplier;
-import org.jtwig.environment.Environment;
-import org.jtwig.exceptions.CalculationException;
 import org.jtwig.functions.FunctionRequest;
 import org.jtwig.functions.JtwigFunction;
 import org.jtwig.i18n.decorate.ReplacementMessageDecorator;
-import org.jtwig.translate.configuration.TranslateConfiguration;
 import org.jtwig.translate.decorator.PluralSelector;
-import org.jtwig.translate.function.extract.LocaleExtractor;
-import org.jtwig.translate.function.extract.ReplacementsExtractor;
-import org.jtwig.util.ErrorMessageFormatter;
+import org.jtwig.translate.function.extract.TranslateParameterExtractor;
 
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Locale;
 
 import static java.util.Arrays.asList;
 
 public class TranslateChoiceFunction implements JtwigFunction {
-    private final LocaleExtractor localeExtractor;
-    private final ReplacementsExtractor replacementsExtractor;
+    private final TranslateParameterExtractor translateParameterExtractor;
 
-    public TranslateChoiceFunction(LocaleExtractor localeExtractor, ReplacementsExtractor replacementsExtractor) {
-        this.localeExtractor = localeExtractor;
-        this.replacementsExtractor = replacementsExtractor;
+    public TranslateChoiceFunction(TranslateParameterExtractor translateParameterExtractor) {
+        this.translateParameterExtractor = translateParameterExtractor;
     }
 
     @Override
@@ -36,7 +26,7 @@ public class TranslateChoiceFunction implements JtwigFunction {
 
     @Override
     public Collection<String> aliases() {
-        return asList("transchoice");
+        return Collections.singletonList("transchoice");
     }
 
     @Override
@@ -45,44 +35,22 @@ public class TranslateChoiceFunction implements JtwigFunction {
         String message = request.getEnvironment().getValueEnvironment().getStringConverter().convert(request.get(0));
         BigDecimal count = request.getEnvironment().getValueEnvironment().getNumberConverter().convert(request.get(1))
                 .orThrow(request.getPosition(), String.format("Expecting number as second argument but got '%s'", request.get(1)));
-        Collection<ReplacementMessageDecorator.Replacement> replacements = Collections.emptyList();
-        Locale locale = getLocaleSupplier(request.getEnvironment()).get();
 
-        if (request.getNumberOfArguments() == 3) {
-            Optional<Locale> localeExtract = localeExtractor.extract(request.getEnvironment(), request.get(2));
-            if (localeExtract.isPresent()) {
-                locale = localeExtract.get();
-            } else {
-                Optional<Collection<ReplacementMessageDecorator.Replacement>> collectionOptional = replacementsExtractor.extract(request.getEnvironment(), request.get(2));
-                if (collectionOptional.isPresent()) {
-                    replacements = collectionOptional.get();
-                } else {
-                    throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map or locale as third argument, but got '%s'", request.get(2))));
-                }
-            }
-        } else if (request.getNumberOfArguments() == 4) {
-            Optional<Collection<ReplacementMessageDecorator.Replacement>> collectionOptional = replacementsExtractor.extract(request.getEnvironment(), request.get(2));
-            if (collectionOptional.isPresent()) {
-                replacements = collectionOptional.get();
-            } else {
-                throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map as third argument, but got '%s'", request.get(2))));
-            }
-            Optional<Locale> localeExtract = localeExtractor.extract(request.getEnvironment(), request.get(3));
-            if (localeExtract.isPresent()) {
-                locale = localeExtract.get();
-            } else {
-                throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting locale as fourth argument, but got '%s'", request.get(3))));
-            }
+        TranslateParameterExtractor.TranslateChoiceParameters parameters;
+
+        if (request.getNumberOfArguments() == 2) {
+            parameters = translateParameterExtractor.extractChoiceForTwoArguments(request);
+        } else if (request.getNumberOfArguments() == 3) {
+            parameters = translateParameterExtractor.extractForThreeArguments(request);
+        } else {
+            parameters = translateParameterExtractor.extractForFourArguments(request);
         }
 
         return new Translator(request.getEnvironment())
-                .translate(message, locale, asList(
+                .translate(message, parameters.getLocale(), asList(
                         new PluralSelector(request.getPosition(), count.intValue()),
-                        new ReplacementMessageDecorator(replacements)
+                        new ReplacementMessageDecorator(parameters.getReplacements())
                 ));
     }
 
-    private Supplier<Locale> getLocaleSupplier(Environment environment) {
-        return TranslateConfiguration.currentLocaleSupplier(environment);
-    }
 }

@@ -27,7 +27,7 @@ public class TranslateFunctionsTest {
     public void translateSimple() throws Exception {
         String result =
                 inlineTemplate("{{ 'Hi' | translate }}", configuration()
-                        .withExtension(new TranslateExtension(new DefaultTranslateConfiguration()))
+                        .extensions().add(new TranslateExtension(new DefaultTranslateConfiguration())).and()
                         .build())
                         .render(newModel());
 
@@ -40,10 +40,10 @@ public class TranslateFunctionsTest {
 
         String result =
                 inlineTemplate("{{ 'Hi' | translate }}", configuration()
-                                .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                        .messages().withMessageSource(current, singleEntryMap("Hi", "Ciao")).and()
-                                        .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
-                                        .build()))
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                                .messages().withMessageSource(current, singleEntryMap("Hi", "Ciao")).and()
+                                .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
+                                .build())).and()
                                 .build()
                 ).render(newModel());
 
@@ -56,10 +56,10 @@ public class TranslateFunctionsTest {
 
         String result =
                 inlineTemplate("{{ 'Hi %name%' | translate({ '%name%': 'Joao' }) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .messages().withMessageSource(current, singleEntryMap("Hi %name%", "Ciao %name%")).and()
                                 .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
-                                .build())).build())
+                                .build())).and().build())
                         .render(newModel());
 
         assertThat(result, is("Ciao Joao"));
@@ -72,10 +72,10 @@ public class TranslateFunctionsTest {
         expectedException.expectMessage(containsString("Expecting map or locale as second argument, but got '1'"));
 
         inlineTemplate("{{ 'Hi %name%' | translate(1) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                .messages().withMessageSource(current, singleEntryMap("Hi %name%", "Ciao %name%")).and()
-                                .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
-                                .build())).build())
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .messages().withMessageSource(current, singleEntryMap("Hi %name%", "Ciao %name%")).and()
+                        .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
+                        .build())).and().build())
                         .render(newModel());
     }
 
@@ -85,12 +85,12 @@ public class TranslateFunctionsTest {
 
         String result =
                 inlineTemplate("{{ 'Hi %name%' | translate({ '%name%': 'Joao' }, 'pt') }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .messages().withMessageSource(current, singleEntryMap("Hi %name%", "Ciao %name%"))
                                 .withMessageSource(Locale.forLanguageTag("pt"), singleEntryMap("Hi %name%", "Ola %name%"))
                                 .and()
                                 .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
-                                .build()))
+                                .build())).and()
                         .build())
         .render(newModel());
 
@@ -104,12 +104,12 @@ public class TranslateFunctionsTest {
         expectedException.expectMessage(containsString("Expecting map as second argument, but got '1'"));
 
         inlineTemplate("{{ 'Hi %name%' | translate(1, 'pt') }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                .messages().withMessageSource(current, singleEntryMap("Hi %name%", "Ciao %name%"))
-                                .withMessageSource(Locale.forLanguageTag("pt"), singleEntryMap("Hi %name%", "Ola %name%"))
-                                .and()
-                                .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
-                                .build()))
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .messages().withMessageSource(current, singleEntryMap("Hi %name%", "Ciao %name%"))
+                        .withMessageSource(Locale.forLanguageTag("pt"), singleEntryMap("Hi %name%", "Ola %name%"))
+                        .and()
+                        .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
+                        .build())).and()
                         .build())
         .render(newModel());
     }
@@ -121,12 +121,12 @@ public class TranslateFunctionsTest {
         expectedException.expectMessage(containsString("Expecting locale as third argument, but got '1'"));
 
         inlineTemplate("{{ 'Hi %name%' | translate({}, 1) }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                .messages().withMessageSource(current, singleEntryMap("Hi %name%", "Ciao %name%"))
-                                .withMessageSource(Locale.forLanguageTag("pt"), singleEntryMap("Hi %name%", "Ola %name%"))
-                                .and()
-                                .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
-                                .build()))
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .messages().withMessageSource(current, singleEntryMap("Hi %name%", "Ciao %name%"))
+                        .withMessageSource(Locale.forLanguageTag("pt"), singleEntryMap("Hi %name%", "Ola %name%"))
+                        .and()
+                        .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
+                        .build())).and()
                         .build())
         .render(newModel());
     }
@@ -137,12 +137,12 @@ public class TranslateFunctionsTest {
 
         String result =
                 inlineTemplate("{{ 'Hello' | translate('pt') }}", configuration()
-                        .withExtension(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .messages().withMessageSource(current, singleEntryMap("Hello", "Ciao"))
-                                        .withMessageSource(Locale.forLanguageTag("pt"), singleEntryMap("Hello", "Ola"))
-                                        .and()
-                                        .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
-                                        .build()))
+                                .withMessageSource(Locale.forLanguageTag("pt"), singleEntryMap("Hello", "Ola"))
+                                .and()
+                                .withCurrentLocaleSupplier(new StaticLocaleSupplier(current))
+                                .build())).and()
                                 .build())
                         .render(newModel());
 
