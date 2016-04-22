@@ -32,7 +32,7 @@ public class TranslateParameterExtractor {
     public TranslateChoiceParameters extractForOneExtraArgument(FunctionRequest request, Object input) {
         LocaleOrReplacementsExtractor.Result result = localeOrReplacementsExtractor.extractor(request.getEnvironment(), input);
         if (result.isEmpty()) {
-            throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map or locale as third argument, but got '%s'", input)));
+            throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map or locale, but got '%s'", input)));
         } else {
             Locale locale = result.getLocale().or(TranslateConfiguration.currentLocaleSupplier(request.getEnvironment()));
             Collection<ReplacementMessageDecorator.Replacement> replacements =
@@ -50,14 +50,14 @@ public class TranslateParameterExtractor {
         if (collectionOptional.isPresent()) {
             replacements = collectionOptional.get();
         } else {
-            throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map as third argument, but got '%s'", firstArgument)));
+            throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map, but got '%s'", firstArgument)));
         }
 
         Optional<Locale> localeExtract = localeExtractor.extract(request.getEnvironment(), secondArgument);
         if (localeExtract.isPresent()) {
             locale = localeExtract.get();
         } else {
-            throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting locale as fourth argument, but got '%s'", secondArgument)));
+            throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting locale, but got '%s'", secondArgument)));
         }
 
         return new TranslateChoiceParameters(locale, replacements);

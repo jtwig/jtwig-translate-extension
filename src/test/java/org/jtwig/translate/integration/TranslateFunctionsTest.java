@@ -69,7 +69,7 @@ public class TranslateFunctionsTest {
     public void translateWithInvalidSecondArgument() throws Exception {
         Locale current = Locale.ITALIAN;
 
-        expectedException.expectMessage(containsString("Expecting map or locale as second argument, but got '1'"));
+        expectedException.expectMessage(containsString("Expecting map or locale, but got '1'"));
 
         inlineTemplate("{{ 'Hi %name%' | translate(1) }}", configuration()
                         .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
@@ -101,7 +101,7 @@ public class TranslateFunctionsTest {
     public void translateWithParametersInAnotherLocaleWithWrong2ndParameter() throws Exception {
         Locale current = Locale.ITALIAN;
 
-        expectedException.expectMessage(containsString("Expecting map as second argument, but got '1'"));
+        expectedException.expectMessage(containsString("Expecting map, but got '1'"));
 
         inlineTemplate("{{ 'Hi %name%' | translate(1, 'pt') }}", configuration()
                         .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
@@ -118,7 +118,7 @@ public class TranslateFunctionsTest {
     public void translateWithParametersInAnotherLocaleWithWrong3rdParameter() throws Exception {
         Locale current = Locale.ITALIAN;
 
-        expectedException.expectMessage(containsString("Expecting locale as third argument, but got '1'"));
+        expectedException.expectMessage(containsString("Expecting locale, but got '1'"));
 
         inlineTemplate("{{ 'Hi %name%' | translate({}, 1) }}", configuration()
                         .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
