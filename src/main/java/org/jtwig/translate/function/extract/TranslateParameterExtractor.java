@@ -22,17 +22,17 @@ public class TranslateParameterExtractor {
         this.localeOrReplacementsExtractor = localeOrReplacementsExtractor;
     }
 
-    public TranslateChoiceParameters extractChoiceForTwoArguments(FunctionRequest request) {
+    public TranslateChoiceParameters extractNoExtraArguments(FunctionRequest request) {
         return new TranslateChoiceParameters(
                 TranslateConfiguration.currentLocaleSupplier(request.getEnvironment()).get(),
                 Collections.<ReplacementMessageDecorator.Replacement>emptyList()
         );
     }
 
-    public TranslateChoiceParameters extractForThreeArguments (FunctionRequest request) {
-        LocaleOrReplacementsExtractor.Result result = localeOrReplacementsExtractor.extractor(request.getEnvironment(), request.get(2));
+    public TranslateChoiceParameters extractForOneExtraArgument(FunctionRequest request, Object input) {
+        LocaleOrReplacementsExtractor.Result result = localeOrReplacementsExtractor.extractor(request.getEnvironment(), input);
         if (result.isEmpty()) {
-            throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map or locale as third argument, but got '%s'", request.get(2))));
+            throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map or locale as third argument, but got '%s'", input)));
         } else {
             Locale locale = result.getLocale().or(TranslateConfiguration.currentLocaleSupplier(request.getEnvironment()));
             Collection<ReplacementMessageDecorator.Replacement> replacements =
@@ -42,22 +42,22 @@ public class TranslateParameterExtractor {
         }
     }
 
-    public TranslateChoiceParameters extractForFourArguments (FunctionRequest request) {
+    public TranslateChoiceParameters extractForTwoExtraArguments(FunctionRequest request, Object firstArgument, Object secondArgument) {
         Collection<ReplacementMessageDecorator.Replacement> replacements;
         Locale locale;
 
-        Optional<Collection<ReplacementMessageDecorator.Replacement>> collectionOptional = replacementsExtractor.extract(request.getEnvironment(), request.get(2));
+        Optional<Collection<ReplacementMessageDecorator.Replacement>> collectionOptional = replacementsExtractor.extract(request.getEnvironment(), firstArgument);
         if (collectionOptional.isPresent()) {
             replacements = collectionOptional.get();
         } else {
-            throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map as third argument, but got '%s'", request.get(2))));
+            throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map as third argument, but got '%s'", firstArgument)));
         }
 
-        Optional<Locale> localeExtract = localeExtractor.extract(request.getEnvironment(), request.get(3));
+        Optional<Locale> localeExtract = localeExtractor.extract(request.getEnvironment(), secondArgument);
         if (localeExtract.isPresent()) {
             locale = localeExtract.get();
         } else {
-            throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting locale as fourth argument, but got '%s'", request.get(3))));
+            throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting locale as fourth argument, but got '%s'", secondArgument)));
         }
 
         return new TranslateChoiceParameters(locale, replacements);

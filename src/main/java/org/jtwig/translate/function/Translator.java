@@ -10,13 +10,7 @@ import java.util.Collection;
 import java.util.Locale;
 
 public class Translator {
-    private final Environment environment;
-
-    public Translator(Environment environment) {
-        this.environment = environment;
-    }
-
-    public String translate (String message, Locale locale, Collection<MessageDecorator> messageDecorators) {
+    public String translate (Environment environment, String message, Locale locale, Collection<MessageDecorator> messageDecorators) {
         String key = message.trim();
         MessageDecorator messageDecorator = new CompositeMessageDecorator(messageDecorators);
         return TranslateConfiguration.messageResolver(environment)

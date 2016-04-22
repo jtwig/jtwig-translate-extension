@@ -5,6 +5,7 @@ import org.jtwig.extension.Extension;
 import org.jtwig.translate.configuration.TranslateConfiguration;
 import org.jtwig.translate.function.TranslateChoiceFunction;
 import org.jtwig.translate.function.TranslateFunction;
+import org.jtwig.translate.function.Translator;
 import org.jtwig.translate.function.extract.LocaleExtractor;
 import org.jtwig.translate.function.extract.LocaleOrReplacementsExtractor;
 import org.jtwig.translate.function.extract.ReplacementsExtractor;
@@ -23,13 +24,17 @@ public class TranslateExtension implements Extension {
     @Override
     public void configure(EnvironmentConfigurationBuilder environmentConfigurationBuilder) {
         configuration.registerParameters(environmentConfigurationBuilder);
+
+        Translator translator = new Translator();
         LocaleExtractor localeExtractor = new LocaleExtractor();
         ReplacementsExtractor replacementsExtractor = new ReplacementsExtractor();
+        LocaleOrReplacementsExtractor localeOrReplacementsExtractor = new LocaleOrReplacementsExtractor(localeExtractor, replacementsExtractor);
 
         TranslateParameterExtractor parameterExtractor = new TranslateParameterExtractor(
                 localeExtractor, replacementsExtractor,
-                new LocaleOrReplacementsExtractor(localeExtractor, replacementsExtractor)
+                localeOrReplacementsExtractor
         );
+
         environmentConfigurationBuilder
                 .parser()
                     .addonParserProviders().add(new TranslateAddonParserProvider()).and()
@@ -39,8 +44,8 @@ public class TranslateExtension implements Extension {
                     .and()
                     .and()
                 .functions()
-                    .add(new TranslateFunction(localeExtractor, replacementsExtractor))
-                    .add(new TranslateChoiceFunction(parameterExtractor))
+                    .add(new TranslateFunction(parameterExtractor, translator))
+                    .add(new TranslateChoiceFunction(parameterExtractor, translator))
         ;
     }
 }

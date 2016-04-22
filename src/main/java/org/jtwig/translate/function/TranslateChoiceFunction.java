@@ -14,9 +14,11 @@ import static java.util.Arrays.asList;
 
 public class TranslateChoiceFunction implements JtwigFunction {
     private final TranslateParameterExtractor translateParameterExtractor;
+    private final Translator translator;
 
-    public TranslateChoiceFunction(TranslateParameterExtractor translateParameterExtractor) {
+    public TranslateChoiceFunction(TranslateParameterExtractor translateParameterExtractor, Translator translator) {
         this.translateParameterExtractor = translateParameterExtractor;
+        this.translator = translator;
     }
 
     @Override
@@ -39,15 +41,15 @@ public class TranslateChoiceFunction implements JtwigFunction {
         TranslateParameterExtractor.TranslateChoiceParameters parameters;
 
         if (request.getNumberOfArguments() == 2) {
-            parameters = translateParameterExtractor.extractChoiceForTwoArguments(request);
+            parameters = translateParameterExtractor.extractNoExtraArguments(request);
         } else if (request.getNumberOfArguments() == 3) {
-            parameters = translateParameterExtractor.extractForThreeArguments(request);
+            parameters = translateParameterExtractor.extractForOneExtraArgument(request, request.get(2));
         } else {
-            parameters = translateParameterExtractor.extractForFourArguments(request);
+            parameters = translateParameterExtractor.extractForTwoExtraArguments(request, request.get(2), request.get(3));
         }
 
-        return new Translator(request.getEnvironment())
-                .translate(message, parameters.getLocale(), asList(
+        return translator
+                .translate(request.getEnvironment(), message, parameters.getLocale(), asList(
                         new PluralSelector(request.getPosition(), count.intValue()),
                         new ReplacementMessageDecorator(parameters.getReplacements())
                 ));

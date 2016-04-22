@@ -38,7 +38,7 @@ public class TranslateParameterExtractorTest {
         when(supplier.get()).thenReturn(locale);
 
         TranslateParameterExtractor.TranslateChoiceParameters result =
-                underTest.extractChoiceForTwoArguments(request);
+                underTest.extractNoExtraArguments(request);
 
         assertThat(result.getLocale(), is(locale));
         assertThat(result.getReplacements(), is(empty()));
@@ -51,7 +51,6 @@ public class TranslateParameterExtractorTest {
         Environment environment = mock(Environment.class);
 
         when(request.getEnvironment()).thenReturn(environment);
-        when(request.get(2)).thenReturn(value);
         when(localeOrReplacementsExtractor.extractor(request.getEnvironment(), value))
                 .thenReturn(new LocaleOrReplacementsExtractor.Result(
                         Optional.<Locale>absent(),
@@ -60,7 +59,7 @@ public class TranslateParameterExtractorTest {
         expectedException.expect(CalculationException.class);
         expectedException.expectMessage(containsString(String.format("Expecting map or locale as third argument, but got '%s'", value)));
 
-        underTest.extractForThreeArguments(request);
+        underTest.extractForOneExtraArgument(request, value);
     }
 
     @Test
@@ -79,7 +78,7 @@ public class TranslateParameterExtractorTest {
                         Optional.of(locale),
                         Optional.<Collection<ReplacementMessageDecorator.Replacement>>absent()));
 
-        TranslateParameterExtractor.TranslateChoiceParameters result = underTest.extractForThreeArguments(request);
+        TranslateParameterExtractor.TranslateChoiceParameters result = underTest.extractForOneExtraArgument(request, value);
 
         assertThat(result.getLocale(), is(locale));
         assertThat(result.getReplacements(), is(empty()));
@@ -97,13 +96,12 @@ public class TranslateParameterExtractorTest {
         when(supplier.get()).thenReturn(locale);
         when(request.getEnvironment()).thenReturn(environment);
         when(environment.parameter("currentLocaleSupplier")).thenReturn(supplier);
-        when(request.get(2)).thenReturn(value);
         when(localeOrReplacementsExtractor.extractor(request.getEnvironment(), value))
                 .thenReturn(new LocaleOrReplacementsExtractor.Result(
                         Optional.<Locale>absent(),
                         Optional.of(replacements)));
 
-        TranslateParameterExtractor.TranslateChoiceParameters result = underTest.extractForThreeArguments(request);
+        TranslateParameterExtractor.TranslateChoiceParameters result = underTest.extractForOneExtraArgument(request, value);
 
         assertThat(result.getLocale(), is(locale));
         assertThat(result.getReplacements(), is(replacements));
@@ -116,13 +114,12 @@ public class TranslateParameterExtractorTest {
         Environment environment = mock(Environment.class);
 
         when(request.getEnvironment()).thenReturn(environment);
-        when(request.get(2)).thenReturn(argument2);
         when(replacementsExtractor.extract(environment, argument2)).thenReturn(Optional.<Collection<ReplacementMessageDecorator.Replacement>>absent());
 
         expectedException.expect(CalculationException.class);
         expectedException.expectMessage(containsString(String.format("Expecting map as third argument, but got '%s'", argument2)));
 
-        underTest.extractForFourArguments(request);
+        underTest.extractForTwoExtraArguments(request, argument2, new Object());
     }
 
     @Test
@@ -134,15 +131,13 @@ public class TranslateParameterExtractorTest {
         Environment environment = mock(Environment.class);
 
         when(request.getEnvironment()).thenReturn(environment);
-        when(request.get(2)).thenReturn(argument2);
-        when(request.get(3)).thenReturn(argument3);
         when(replacementsExtractor.extract(environment, argument2)).thenReturn(Optional.of(replacements));
         when(localeExtractor.extract(environment, argument3)).thenReturn(Optional.<Locale>absent());
 
         expectedException.expect(CalculationException.class);
         expectedException.expectMessage(containsString(String.format("Expecting locale as fourth argument, but got '%s'", argument3)));
 
-        underTest.extractForFourArguments(request);
+        underTest.extractForTwoExtraArguments(request, argument2, argument3);
     }
 
     @Test
@@ -155,12 +150,10 @@ public class TranslateParameterExtractorTest {
         Environment environment = mock(Environment.class);
 
         when(request.getEnvironment()).thenReturn(environment);
-        when(request.get(2)).thenReturn(argument2);
-        when(request.get(3)).thenReturn(argument3);
         when(replacementsExtractor.extract(environment, argument2)).thenReturn(Optional.of(replacements));
         when(localeExtractor.extract(environment, argument3)).thenReturn(Optional.of(locale));
 
-        TranslateParameterExtractor.TranslateChoiceParameters result = underTest.extractForFourArguments(request);
+        TranslateParameterExtractor.TranslateChoiceParameters result = underTest.extractForTwoExtraArguments(request, argument2, argument3);
 
         assertThat(result.getLocale(), is(locale));
         assertThat(result.getReplacements(), is(replacements));
