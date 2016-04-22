@@ -46,7 +46,7 @@ public class TranslateChoiceFunctionTest {
 
     @Test
     public void translateSimpleInvalid3rdArgument() throws Exception {
-        expectedException.expectMessage(containsString("Expecting map or locale as third argument, but got '1'"));
+        expectedException.expectMessage(containsString("Expecting map or locale, but got '1'"));
 
         inlineTemplate("{{ 'Hi' | translateChoice(0, 1) }}", configuration()
                 .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
@@ -56,7 +56,7 @@ public class TranslateChoiceFunctionTest {
 
     @Test
     public void translateSimpleInvalid3rdArgumentIn4() throws Exception {
-        expectedException.expectMessage(containsString("Expecting map as third argument, but got '1'"));
+        expectedException.expectMessage(containsString("Expecting map, but got '1'"));
 
         inlineTemplate("{{ 'Hi' | translateChoice(0, 1, 2) }}", configuration()
                 .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
@@ -66,7 +66,7 @@ public class TranslateChoiceFunctionTest {
 
     @Test
     public void translateSimpleInvalid4thArgumentIn4() throws Exception {
-        expectedException.expectMessage(containsString("Expecting locale as fourth argument, but got '2'"));
+        expectedException.expectMessage(containsString("Expecting locale, but got '2'"));
 
         inlineTemplate("{{ 'Hi' | translateChoice(0, {}, 2) }}", configuration()
                 .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
