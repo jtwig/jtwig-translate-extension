@@ -55,7 +55,7 @@ public class PropertiesLocalizedMessageResourceLoaderTest {
         when(environment.getResourceEnvironment().getResourceService()).thenReturn(resourceService);
         when(resourceService.loadMetadata(resourceReference)).thenReturn(resourceMetadata);
         when(resourceMetadata.exists()).thenReturn(true);
-        when(filenameLocaleExtractor.extractLocale(resourceMetadata)).thenReturn(Optional.<Locale>absent());
+        when(filenameLocaleExtractor.extractLocale(environment, resourceMetadata)).thenReturn(Optional.<Locale>absent());
         when(resourceMetadata.load()).thenReturn(new ByteArrayInputStream("".getBytes()));
 
         expectedException.expect(ResourceException.class);
@@ -75,7 +75,7 @@ public class PropertiesLocalizedMessageResourceLoaderTest {
         when(environment.getResourceEnvironment().getResourceService()).thenReturn(resourceService);
         when(resourceService.loadMetadata(resourceReference)).thenReturn(resourceMetadata);
         when(resourceMetadata.exists()).thenReturn(true);
-        when(filenameLocaleExtractor.extractLocale(resourceMetadata)).thenReturn(Optional.<Locale>absent());
+        when(filenameLocaleExtractor.extractLocale(environment, resourceMetadata)).thenReturn(Optional.<Locale>absent());
         when(resourceMetadata.load()).thenReturn(inputStream);
         when(inputStream.read()).thenThrow(IOException.class);
         when(inputStream.read(Mockito.any(byte[].class))).thenThrow(IOException.class);

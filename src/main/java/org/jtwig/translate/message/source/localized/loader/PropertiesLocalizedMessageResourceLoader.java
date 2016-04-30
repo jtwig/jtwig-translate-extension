@@ -32,7 +32,7 @@ public class PropertiesLocalizedMessageResourceLoader implements LocalizedMessag
             Properties properties = new Properties();
             try {
                 properties.load(resourceMetadata.load());
-                Optional<Locale> localeOptional = localeExtractor.extractLocale(resourceMetadata);
+                Optional<Locale> localeOptional = localeExtractor.extractLocale(environment, resourceMetadata);
                 if (!localeOptional.isPresent()) {
                     throw new ResourceException(String.format("Could not extract locale from resource '%s'", resourceReference));
                 } else {

@@ -2,7 +2,7 @@ package org.jtwig.translate.message.source.cache;
 
 import org.jtwig.environment.Environment;
 import org.jtwig.translate.message.source.MessageSource;
-import org.jtwig.translate.message.source.MessageSourceFactory;
+import org.jtwig.translate.message.source.factory.MessageSourceFactory;
 
 public class CachedMessageSourceFactory implements MessageSourceFactory {
     private final MessageSourceCache messageSourceCache;

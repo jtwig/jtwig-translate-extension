@@ -1,7 +1,9 @@
 package org.jtwig.translate.message.source.localized.resource.locale;
 
 import com.google.common.base.Optional;
+import org.jtwig.environment.Environment;
 import org.jtwig.resource.metadata.ResourceMetadata;
+import org.jtwig.translate.TranslateExtension;
 import org.jtwig.translate.locale.LocaleResolver;
 
 import java.io.File;
@@ -18,15 +20,13 @@ import java.util.Locale;
  */
 public class FilenameLocaleExtractor {
     private static final String FILE_PROTOCOL = "file";
-    private final LocaleResolver localeResolver;
     private final RetrieveLocaleExpressionFromFilename retrieveLocaleExpressionFromFilename;
 
-    public FilenameLocaleExtractor(LocaleResolver localeResolver, RetrieveLocaleExpressionFromFilename retrieveLocaleExpressionFromFilename) {
-        this.localeResolver = localeResolver;
+    public FilenameLocaleExtractor(RetrieveLocaleExpressionFromFilename retrieveLocaleExpressionFromFilename) {
         this.retrieveLocaleExpressionFromFilename = retrieveLocaleExpressionFromFilename;
     }
 
-    public Optional<Locale> extractLocale(ResourceMetadata metadata) {
+    public Optional<Locale> extractLocale(Environment environment, ResourceMetadata metadata) {
         Optional<URL> urlOptional = metadata.toUrl();
         if (urlOptional.isPresent()) {
             URL url = urlOptional.get();
@@ -34,6 +34,7 @@ public class FilenameLocaleExtractor {
                 File file = new File(url.getFile());
                 Optional<String> expression = retrieveLocaleExpressionFromFilename.retrieveLocaleExpression(file.getName());
                 if (expression.isPresent()) {
+                    LocaleResolver localeResolver = TranslateExtension.enviroment(environment).getLocaleResolver();
                     return Optional.of(localeResolver.resolve(expression.get()));
                 }
             }

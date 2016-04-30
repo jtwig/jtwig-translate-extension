@@ -3,7 +3,7 @@ package org.jtwig.translate.configuration;
 import com.google.common.base.Supplier;
 import org.apache.commons.lang3.builder.Builder;
 import org.jtwig.translate.locale.LocaleResolver;
-import org.jtwig.translate.message.source.MessageSourceFactory;
+import org.jtwig.translate.message.source.factory.MessageSourceFactory;
 
 import java.util.Locale;
 
