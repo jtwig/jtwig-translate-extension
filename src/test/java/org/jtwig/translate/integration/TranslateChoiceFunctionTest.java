@@ -1,10 +1,14 @@
 package org.jtwig.translate.integration;
 
-import org.jtwig.i18n.source.message.MapMessageSource;
 import org.jtwig.translate.TranslateExtension;
 import org.jtwig.translate.configuration.DefaultTranslateConfiguration;
 import org.jtwig.translate.configuration.StaticLocaleSupplier;
 import org.jtwig.translate.configuration.TranslateConfigurationBuilder;
+import org.jtwig.translate.message.source.InMemoryMessageSource;
+import org.jtwig.translate.message.source.MessageSourceFactory;
+import org.jtwig.translate.message.source.SingletonMessageSourceFactory;
+import org.jtwig.translate.message.source.localized.resource.InMemoryLocalizedMessageResource;
+import org.jtwig.translate.message.source.localized.resource.LocalizedMessageResource;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -122,7 +126,7 @@ public class TranslateChoiceFunctionTest {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(1) }}", configuration()
                         .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                .messages().withMessageSource(Locale.ITALY, singleMessageSource("{0} Zero | {1} One | ]1, Inf[ Multi", "{0} Zero | [1, Inf[ Varios")).and()
+                                .withMessageSourceFactory(singleEntry(Locale.ITALY, "{0} Zero | {1} One | ]1, Inf[ Multi", "{0} Zero | [1, Inf[ Varios"))
                                 .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ITALY))
                                 .build())).and()
                         .build())
@@ -136,7 +140,7 @@ public class TranslateChoiceFunctionTest {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(3, 'it-IT') }}", configuration()
                         .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                .messages().withMessageSource(Locale.ITALY, singleMessageSource("{0} Zero | {1} One | ]1, Inf[ Multi", "{0} Zero | [1, Inf[ Varios")).and()
+                                .withMessageSourceFactory(singleEntry(Locale.ITALY, "{0} Zero | {1} One | ]1, Inf[ Multi", "{0} Zero | [1, Inf[ Varios"))
                                 .build())).and()
                         .build())
                         .render(newModel());
@@ -149,7 +153,7 @@ public class TranslateChoiceFunctionTest {
         String result =
                 inlineTemplate("{{ '{0} Zero | {1} One | ]1, Inf[ Multi' | translateChoice(3, {'%name%': 'Joao'},'it-IT') }}", configuration()
                         .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                .messages().withMessageSource(Locale.ITALY, singleMessageSource("{0} Zero | {1} One | ]1, Inf[ Multi", "{0} Zero | [1, Inf[ Varios %name%")).and()
+                                .withMessageSourceFactory(singleEntry(Locale.ITALY, "{0} Zero | {1} One | ]1, Inf[ Multi", "{0} Zero | [1, Inf[ Varios %name%"))
                                 .build())).and()
                         .build())
                         .render(newModel());
@@ -157,9 +161,13 @@ public class TranslateChoiceFunctionTest {
         assertThat(result, is("Varios Joao"));
     }
 
-    private MapMessageSource singleMessageSource(final String key, final String value) {
-        return new MapMessageSource(new HashMap<String, String>() {{
-            put(key, value);
-        }});
+    private MessageSourceFactory singleEntry(final Locale locale, final String origin, final String target) {
+        return new SingletonMessageSourceFactory(new InMemoryMessageSource(
+                new HashMap<Locale, LocalizedMessageResource>() {{
+                    put(locale, new InMemoryLocalizedMessageResource(locale, new HashMap<String, String>() {{
+                        put(origin, target);
+                    }}));
+                }}
+        ));
     }
 }

@@ -5,7 +5,8 @@ import com.google.common.base.Supplier;
 import org.jtwig.environment.Environment;
 import org.jtwig.exceptions.CalculationException;
 import org.jtwig.functions.FunctionRequest;
-import org.jtwig.i18n.decorate.ReplacementMessageDecorator;
+import org.jtwig.translate.environment.TranslateEnvironment;
+import org.jtwig.translate.message.decorate.ReplacementMessageDecorator;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -32,10 +33,12 @@ public class TranslateParameterExtractorTest {
     @Test
     public void extractChoiceForTwoArguments() throws Exception {
         Locale locale = Locale.CANADA;
+        TranslateEnvironment translateEnvironment = mock(TranslateEnvironment.class);
         FunctionRequest request = mock(FunctionRequest.class, RETURNS_DEEP_STUBS);
         Supplier<Locale> supplier = mock(Supplier.class);
-        when(request.getEnvironment().parameter("currentLocaleSupplier")).thenReturn(supplier);
         when(supplier.get()).thenReturn(locale);
+        when(request.getEnvironment().parameter("translate-extension-environment")).thenReturn(translateEnvironment);
+        when(translateEnvironment.getLocaleSupplier()).thenReturn(supplier);
 
         TranslateParameterExtractor.TranslateChoiceParameters result =
                 underTest.extractNoExtraArguments(request);
@@ -69,10 +72,13 @@ public class TranslateParameterExtractorTest {
         Environment environment = mock(Environment.class);
         Supplier<Locale> supplier = mock(Supplier.class);
         Locale locale = Locale.CANADA;
+        TranslateEnvironment translateEnvironment = mock(TranslateEnvironment.class);
 
         when(request.getEnvironment()).thenReturn(environment);
         when(environment.parameter("currentLocaleSupplier")).thenReturn(supplier);
         when(request.get(2)).thenReturn(value);
+        when(environment.parameter("translate-extension-environment")).thenReturn(translateEnvironment);
+        when(translateEnvironment.getLocaleSupplier()).thenReturn(supplier);
         when(localeOrReplacementsExtractor.extractor(request.getEnvironment(), value))
                 .thenReturn(new LocaleOrReplacementsExtractor.Result(
                         Optional.of(locale),
@@ -92,10 +98,12 @@ public class TranslateParameterExtractorTest {
         Environment environment = mock(Environment.class);
         Supplier<Locale> supplier = mock(Supplier.class);
         Locale locale = Locale.CANADA;
+        TranslateEnvironment translateEnvironment = mock(TranslateEnvironment.class);
 
         when(supplier.get()).thenReturn(locale);
         when(request.getEnvironment()).thenReturn(environment);
-        when(environment.parameter("currentLocaleSupplier")).thenReturn(supplier);
+        when(environment.parameter("translate-extension-environment")).thenReturn(translateEnvironment);
+        when(translateEnvironment.getLocaleSupplier()).thenReturn(supplier);
         when(localeOrReplacementsExtractor.extractor(request.getEnvironment(), value))
                 .thenReturn(new LocaleOrReplacementsExtractor.Result(
                         Optional.<Locale>absent(),

@@ -2,9 +2,9 @@ package org.jtwig.translate.function;
 
 import org.jtwig.functions.FunctionRequest;
 import org.jtwig.functions.JtwigFunction;
-import org.jtwig.i18n.decorate.MessageDecorator;
-import org.jtwig.i18n.decorate.ReplacementMessageDecorator;
 import org.jtwig.translate.function.extract.TranslateParameterExtractor;
+import org.jtwig.translate.message.decorate.MessageDecorator;
+import org.jtwig.translate.message.decorate.ReplacementMessageDecorator;
 
 import java.util.Collection;
 import java.util.Collections;
