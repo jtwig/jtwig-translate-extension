@@ -2,9 +2,9 @@ package org.jtwig.translate.function;
 
 import com.google.common.base.Supplier;
 import org.jtwig.environment.Environment;
-import org.jtwig.i18n.decorate.CompositeMessageDecorator;
-import org.jtwig.i18n.decorate.MessageDecorator;
-import org.jtwig.translate.configuration.TranslateConfiguration;
+import org.jtwig.translate.TranslateExtension;
+import org.jtwig.translate.message.decorate.CompositeMessageDecorator;
+import org.jtwig.translate.message.decorate.MessageDecorator;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -13,7 +13,7 @@ public class Translator {
     public String translate (Environment environment, String message, Locale locale, Collection<MessageDecorator> messageDecorators) {
         String key = message.trim();
         MessageDecorator messageDecorator = new CompositeMessageDecorator(messageDecorators);
-        return TranslateConfiguration.messageResolver(environment)
+        return TranslateExtension.enviroment(environment).getMessageResolver()
                 .resolve(locale, key, messageDecorator)
                 .or(defaultMessage(key, messageDecorator));
     }

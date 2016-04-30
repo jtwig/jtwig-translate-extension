@@ -2,7 +2,7 @@ package org.jtwig.translate.function.extract;
 
 import com.google.common.base.Optional;
 import org.jtwig.environment.Environment;
-import org.jtwig.i18n.decorate.ReplacementMessageDecorator;
+import org.jtwig.translate.message.decorate.ReplacementMessageDecorator;
 
 import java.util.Collection;
 import java.util.Locale;

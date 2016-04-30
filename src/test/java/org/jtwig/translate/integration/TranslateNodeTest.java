@@ -2,11 +2,15 @@ package org.jtwig.translate.integration;
 
 import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
-import org.jtwig.i18n.source.message.MapMessageSource;
 import org.jtwig.translate.TranslateExtension;
 import org.jtwig.translate.configuration.DefaultTranslateConfiguration;
 import org.jtwig.translate.configuration.StaticLocaleSupplier;
 import org.jtwig.translate.configuration.TranslateConfigurationBuilder;
+import org.jtwig.translate.message.source.InMemoryMessageSource;
+import org.jtwig.translate.message.source.MessageSourceFactory;
+import org.jtwig.translate.message.source.SingletonMessageSourceFactory;
+import org.jtwig.translate.message.source.localized.resource.InMemoryLocalizedMessageResource;
+import org.jtwig.translate.message.source.localized.resource.LocalizedMessageResource;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -38,7 +42,7 @@ public class TranslateNodeTest {
     public void simpleTranslateWithTranslation() throws Exception {
         String result = JtwigTemplate.inlineTemplate("{% trans %}Hi{% endtrans %}", configuration()
                 .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                        .messages().withMessageSource(Locale.ITALY, singleMessageResource("Hi", "Ciao")).and()
+                        .withMessageSourceFactory(singleEntry(Locale.ITALY, "Hi", "Ciao"))
                         .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ITALY))
                         .build())).and()
                 .build())
@@ -51,7 +55,7 @@ public class TranslateNodeTest {
     public void simpleTranslateWithTranslationInto() throws Exception {
         String result = JtwigTemplate.inlineTemplate("{% trans into 'it-IT' %}Hi{% endtrans %}", configuration()
                 .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                        .messages().withMessageSource(Locale.ITALY, singleMessageResource("Hi", "Ciao")).and()
+                        .withMessageSourceFactory(singleEntry(Locale.ITALY, "Hi", "Ciao"))
                         .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ENGLISH))
                         .build())).and()
                 .build())
@@ -66,7 +70,7 @@ public class TranslateNodeTest {
 
         JtwigTemplate.inlineTemplate("{% trans into 1 %}Hi{% endtrans %}", configuration()
                 .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                        .messages().withMessageSource(Locale.ITALY, singleMessageResource("Hi", "Ciao")).and()
+                        .withMessageSourceFactory(singleEntry(Locale.ITALY, "Hi", "Ciao"))
                         .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ENGLISH))
                         .build())).and()
                 .build())
@@ -77,7 +81,7 @@ public class TranslateNodeTest {
     public void simpleTranslateWithTranslationWithParameter() throws Exception {
         String result = JtwigTemplate.inlineTemplate("{% trans with { '%name%': 'Joao' } %}Hi %name%{% endtrans %}", configuration()
                 .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                        .messages().withMessageSource(Locale.ITALY, singleMessageResource("Hi %name%", "Ciao %name%")).and()
+                        .withMessageSourceFactory(singleEntry(Locale.ITALY, "Hi %name%", "Ciao %name%"))
                         .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ITALY))
                         .build())).and()
                 .build())
@@ -92,7 +96,7 @@ public class TranslateNodeTest {
 
         JtwigTemplate.inlineTemplate("{% trans with 1 %}Hi %name%{% endtrans %}", configuration()
                 .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                        .messages().withMessageSource(Locale.ITALY, singleMessageResource("Hi %name%", "Ciao %name%")).and()
+                        .withMessageSourceFactory(singleEntry(Locale.ITALY, "Hi %name%", "Ciao %name%"))
                         .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ITALY))
                         .build())).and()
                 .build())
@@ -103,7 +107,7 @@ public class TranslateNodeTest {
     public void translateWithTranslationWithContextVariable() throws Exception {
         String result = JtwigTemplate.inlineTemplate("{% trans %}Hi %name%{% endtrans %}", configuration()
                 .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                        .messages().withMessageSource(Locale.ITALY, singleMessageResource("Hi %name%", "Ciao %name%")).and()
+                        .withMessageSourceFactory(singleEntry(Locale.ITALY, "Hi %name%", "Ciao %name%"))
                         .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ITALY))
                         .build())).and()
                 .build())
@@ -112,7 +116,13 @@ public class TranslateNodeTest {
         assertThat(result, is("Ciao World"));
     }
 
-    private MapMessageSource singleMessageResource(final String key, final String value) {
-        return new MapMessageSource(new HashMap<String, String>() {{ put(key, value); }});
+    private MessageSourceFactory singleEntry(final Locale locale, final String origin, final String target) {
+        return new SingletonMessageSourceFactory(new InMemoryMessageSource(
+                new HashMap<Locale, LocalizedMessageResource>() {{
+                    put(locale, new InMemoryLocalizedMessageResource(locale, new HashMap<String, String>() {{
+                        put(origin, target);
+                    }}));
+                }}
+        ));
     }
 }

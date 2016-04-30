@@ -3,13 +3,14 @@ package org.jtwig.translate.function.extract;
 import com.google.common.base.Optional;
 import org.jtwig.exceptions.CalculationException;
 import org.jtwig.functions.FunctionRequest;
-import org.jtwig.i18n.decorate.ReplacementMessageDecorator;
-import org.jtwig.translate.configuration.TranslateConfiguration;
+import org.jtwig.translate.message.decorate.ReplacementMessageDecorator;
 import org.jtwig.util.ErrorMessageFormatter;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
+
+import static org.jtwig.translate.TranslateExtension.enviroment;
 
 public class TranslateParameterExtractor {
     private final LocaleExtractor localeExtractor;
@@ -24,7 +25,7 @@ public class TranslateParameterExtractor {
 
     public TranslateChoiceParameters extractNoExtraArguments(FunctionRequest request) {
         return new TranslateChoiceParameters(
-                TranslateConfiguration.currentLocaleSupplier(request.getEnvironment()).get(),
+                enviroment(request.getEnvironment()).getLocaleSupplier().get(),
                 Collections.<ReplacementMessageDecorator.Replacement>emptyList()
         );
     }
@@ -34,9 +35,9 @@ public class TranslateParameterExtractor {
         if (result.isEmpty()) {
             throw new CalculationException(ErrorMessageFormatter.errorMessage(request.getPosition(), String.format("Expecting map or locale, but got '%s'", input)));
         } else {
-            Locale locale = result.getLocale().or(TranslateConfiguration.currentLocaleSupplier(request.getEnvironment()));
-            Collection<ReplacementMessageDecorator.Replacement> replacements =
-                    result.getReplacements().or(Collections.<ReplacementMessageDecorator.Replacement>emptyList());
+            Locale locale = result.getLocale().or(enviroment(request.getEnvironment()).getLocaleSupplier());
+            Collection<ReplacementMessageDecorator.Replacement> empty = Collections.emptyList();
+            Collection<ReplacementMessageDecorator.Replacement> replacements = result.getReplacements().or(empty);
 
             return new TranslateChoiceParameters(locale, replacements);
         }

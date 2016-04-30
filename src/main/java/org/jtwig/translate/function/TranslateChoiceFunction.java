@@ -2,9 +2,9 @@ package org.jtwig.translate.function;
 
 import org.jtwig.functions.FunctionRequest;
 import org.jtwig.functions.JtwigFunction;
-import org.jtwig.i18n.decorate.ReplacementMessageDecorator;
 import org.jtwig.translate.decorator.PluralSelector;
 import org.jtwig.translate.function.extract.TranslateParameterExtractor;
+import org.jtwig.translate.message.decorate.ReplacementMessageDecorator;
 
 import java.math.BigDecimal;
 import java.util.Collection;

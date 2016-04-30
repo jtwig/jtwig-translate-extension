@@ -1,9 +1,9 @@
 package org.jtwig.translate.decorator;
 
 import com.google.common.base.Optional;
-import org.jtwig.i18n.decorate.MessageDecorator;
 import org.jtwig.model.position.Position;
 import org.jtwig.plural.PluralOptions;
+import org.jtwig.translate.message.decorate.MessageDecorator;
 import org.jtwig.util.ErrorMessageFormatter;
 
 public class PluralSelector implements MessageDecorator {

@@ -2,7 +2,8 @@ package org.jtwig.translate.function.extract;
 
 import com.google.common.base.Optional;
 import org.jtwig.environment.Environment;
-import org.jtwig.i18n.locale.LocaleResolver;
+import org.jtwig.translate.environment.TranslateEnvironment;
+import org.jtwig.translate.locale.LocaleResolver;
 import org.junit.Test;
 
 import java.util.Locale;
@@ -26,14 +27,17 @@ public class LocaleExtractorTest {
     public void extractString() throws Exception {
         Environment environment = mock(Environment.class, RETURNS_DEEP_STUBS);
         LocaleResolver localeResolver = mock(LocaleResolver.class);
+        TranslateEnvironment translateEnvironment = mock(TranslateEnvironment.class);
 
-        when(environment.parameter("localeResolver")).thenReturn(localeResolver);
+        when(environment.parameter("translate-extension-environment")).thenReturn(translateEnvironment);
+        when(translateEnvironment.getLocaleResolver()).thenReturn(localeResolver);
         when(localeResolver.resolve("hello")).thenReturn(Locale.CANADA);
 
         Optional<Locale> result = underTest.extract(environment, "hello");
 
         assertSame(Locale.CANADA, result.get());
     }
+
     @Test
     public void extractStringNone() throws Exception {
         Environment environment = mock(Environment.class, RETURNS_DEEP_STUBS);
