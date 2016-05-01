@@ -2,8 +2,6 @@ language: java
 jdk:
   - oraclejdk7
 
-script: ./.travis-build.sh
-
 env:
   TERM: dumb
 
