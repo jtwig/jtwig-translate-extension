@@ -9,6 +9,14 @@ import static org.jtwig.translate.message.source.localized.provider.io.AndFileFi
 import static org.jtwig.translate.message.source.localized.provider.io.NotDirectoryFileFilter.notDirectory;
 
 public class DirectoryFileFinder implements FileFinder {
+    private static final DirectoryFileFinder INSTANCE = new DirectoryFileFinder();
+
+    public static DirectoryFileFinder directory() {
+        return INSTANCE;
+    }
+
+    private DirectoryFileFinder() {}
+
     public Collection<File> find (File baseDirectory, FileFilter fileFilter) {
         Collection<File> result = new ArrayList<>();
         if (baseDirectory.exists()) {

@@ -10,6 +10,14 @@ import static org.jtwig.translate.message.source.localized.provider.io.Directory
 import static org.jtwig.translate.message.source.localized.provider.io.NotDirectoryFileFilter.notDirectory;
 
 public class RecursiveFileFinder implements FileFinder {
+    private static final RecursiveFileFinder INSTANCE = new RecursiveFileFinder();
+
+    public static RecursiveFileFinder recursiveDirectory () {
+        return INSTANCE;
+    }
+
+    private RecursiveFileFinder() {}
+
     @Override
     public Collection<File> find(File baseDirectory, FileFilter fileFilter) {
         Collection<File> result = new ArrayList<>();

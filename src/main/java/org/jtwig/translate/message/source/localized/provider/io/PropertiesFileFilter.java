@@ -6,8 +6,9 @@ import java.io.File;
 import java.io.FileFilter;
 
 public class PropertiesFileFilter implements FileFilter {
+    private static final PropertiesFileFilter INSTANCE = new PropertiesFileFilter();
     public static PropertiesFileFilter properties () {
-        return new PropertiesFileFilter();
+        return INSTANCE;
     }
 
     private PropertiesFileFilter() {}

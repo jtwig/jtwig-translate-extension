@@ -8,6 +8,10 @@ import org.jtwig.translate.message.source.factory.MessageSourceFactory;
 import java.util.Locale;
 
 public class TranslateConfigurationBuilder implements Builder<TranslateConfiguration> {
+    public static TranslateConfigurationBuilder translateConfiguration () {
+        return new TranslateConfigurationBuilder(new DefaultTranslateConfiguration());
+    }
+
     private MessageSourceFactory messageSourceFactory;
     private Supplier<Locale> localeSupplier;
     private LocaleResolver localeResolver;

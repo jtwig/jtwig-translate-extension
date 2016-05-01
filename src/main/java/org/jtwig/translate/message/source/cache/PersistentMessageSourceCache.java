@@ -6,9 +6,16 @@ import org.jtwig.translate.message.source.cache.model.LocaleAndMessage;
 import org.jtwig.translate.message.source.cache.model.LocaleAndMessageFactory;
 
 import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class PersistentMessageSourceCache implements MessageSourceCache {
+    public static PersistentMessageSourceCache persistentCache () {
+        LocaleAndMessageFactory localeAndMessageFactory = new LocaleAndMessageFactory();
+        ConcurrentHashMap<LocaleAndMessage, Optional<String>> cache = new ConcurrentHashMap<>();
+        return new PersistentMessageSourceCache(localeAndMessageFactory, cache);
+    }
+
     private final LocaleAndMessageFactory localeAndMessageFactory;
     private final ConcurrentMap<LocaleAndMessage, Optional<String>> cache;
 

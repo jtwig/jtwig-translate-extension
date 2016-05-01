@@ -12,6 +12,12 @@ import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 public class GuavaMessageSourceCache implements MessageSourceCache {
+    public static GuavaMessageSourceCache guavaCache (Cache<LocaleAndMessage, Optional<String>> cache) {
+        LocaleAndMessageFactory localeAndMessageFactory = new LocaleAndMessageFactory();
+        MessageProviderFactory messageProviderFactory = new MessageProviderFactory();
+        return new GuavaMessageSourceCache(localeAndMessageFactory, messageProviderFactory, cache);
+    }
+
     private final LocaleAndMessageFactory localeAndMessageFactory;
     private final MessageProviderFactory messageProviderFactory;
     private final Cache<LocaleAndMessage, Optional<String>> cache;
