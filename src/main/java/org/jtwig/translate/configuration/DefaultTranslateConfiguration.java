@@ -2,7 +2,7 @@ package org.jtwig.translate.configuration;
 
 import org.jtwig.translate.locale.JavaLocaleResolver;
 import org.jtwig.translate.message.source.EmptyMessageSource;
-import org.jtwig.translate.message.source.SingletonMessageSourceFactory;
+import org.jtwig.translate.message.source.factory.SingletonMessageSourceFactory;
 
 import java.util.Locale;
 

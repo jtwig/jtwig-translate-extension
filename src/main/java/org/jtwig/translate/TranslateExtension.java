@@ -13,7 +13,7 @@ import org.jtwig.translate.function.extract.LocaleOrReplacementsExtractor;
 import org.jtwig.translate.function.extract.ReplacementsExtractor;
 import org.jtwig.translate.function.extract.TranslateParameterExtractor;
 import org.jtwig.translate.message.DefaultMessageResolver;
-import org.jtwig.translate.message.source.DefaultMessageSource;
+import org.jtwig.translate.message.source.InitializableMessageSource;
 import org.jtwig.translate.node.TranslateNode;
 import org.jtwig.translate.parser.TranslateAddonParserProvider;
 import org.jtwig.translate.render.node.TranslateNodeRender;
@@ -33,7 +33,7 @@ public class TranslateExtension implements Extension {
 
     @Override
     public void configure(EnvironmentConfigurationBuilder environmentConfigurationBuilder) {
-        DefaultMessageSource messageSource = new DefaultMessageSource(configuration.getMessageSourceFactory());
+        InitializableMessageSource messageSource = new InitializableMessageSource(configuration.getMessageSourceFactory());
         TranslateEnvironment translateEnvironment = new TranslateEnvironment(
                 new DefaultMessageResolver(messageSource),
                 configuration.getLocaleSupplier(),

@@ -2,7 +2,7 @@ package org.jtwig.translate.message.source.localized;
 
 import org.jtwig.environment.Environment;
 import org.jtwig.resource.reference.ResourceReference;
-import org.jtwig.translate.message.source.MessageSourceFactory;
+import org.jtwig.translate.message.source.factory.MessageSourceFactory;
 import org.jtwig.translate.message.source.localized.loader.LocalizedMessageResourceLoader;
 import org.jtwig.translate.message.source.localized.provider.LocalizedResourceProvider;
 import org.jtwig.translate.message.source.localized.resource.LocalizedMessageResource;

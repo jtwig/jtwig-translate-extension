@@ -9,19 +9,16 @@ import org.jtwig.resource.exceptions.ResourceException;
 import org.jtwig.translate.TranslateExtension;
 import org.jtwig.translate.configuration.DefaultTranslateConfiguration;
 import org.jtwig.translate.configuration.TranslateConfigurationBuilder;
-import org.jtwig.translate.locale.JavaLocaleResolver;
 import org.jtwig.translate.message.source.cache.CachedMessageSourceFactory;
 import org.jtwig.translate.message.source.cache.GuavaMessageSourceCache;
 import org.jtwig.translate.message.source.cache.PersistentMessageSourceCache;
-import org.jtwig.translate.message.source.cache.callable.MessageProviderFactory;
 import org.jtwig.translate.message.source.cache.model.LocaleAndMessage;
 import org.jtwig.translate.message.source.cache.model.LocaleAndMessageFactory;
+import org.jtwig.translate.message.source.factory.CompositeMessageSourceFactory;
 import org.jtwig.translate.message.source.localized.AggregatedLocalizedMessageSourceFactory;
 import org.jtwig.translate.message.source.localized.loader.PropertiesLocalizedMessageResourceLoader;
-import org.jtwig.translate.message.source.localized.provider.CompositeLocalizedResourceProvider;
 import org.jtwig.translate.message.source.localized.provider.FileLocalizedResourceProvider;
-import org.jtwig.translate.message.source.localized.provider.LocalizedResourceProvider;
-import org.jtwig.translate.message.source.localized.provider.RecursiveFileLocalizedResourceProvider;
+import org.jtwig.translate.message.source.localized.provider.file.DirectoryFileFinder;
 import org.jtwig.translate.message.source.localized.resource.locale.FilenameLocaleExtractor;
 import org.jtwig.translate.message.source.localized.resource.locale.RetrieveLocaleExpressionFromFilename;
 import org.junit.Rule;
@@ -30,12 +27,13 @@ import org.junit.rules.ExpectedException;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.jtwig.environment.EnvironmentConfigurationBuilder.configuration;
+import static org.jtwig.translate.configuration.TranslateConfigurationBuilder.translateConfiguration;
+import static org.jtwig.translate.message.source.factory.PropertiesMessageSourceFactoryBuilder.propertiesMessageSource;
 
 public class PropertiesLoadingTest {
     @Rule
@@ -48,8 +46,8 @@ public class PropertiesLoadingTest {
                         .extensions()
                         .add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .withMessageSourceFactory(new AggregatedLocalizedMessageSourceFactory(
-                                        new FileLocalizedResourceProvider(new File("src/test/resources/translation"), propertiesFile()),
-                                        new PropertiesLocalizedMessageResourceLoader(new FilenameLocaleExtractor(new JavaLocaleResolver(), new RetrieveLocaleExpressionFromFilename()))
+                                        new FileLocalizedResourceProvider(new File("src/test/resources/translation"), propertiesFile(), DirectoryFileFinder.directory()),
+                                        new PropertiesLocalizedMessageResourceLoader(new FilenameLocaleExtractor(RetrieveLocaleExpressionFromFilename.instance()))
                                 ))
                                 .build()))
                         .and()
@@ -64,11 +62,28 @@ public class PropertiesLoadingTest {
         String result = JtwigTemplate.inlineTemplate("{{ 'hello' | translate ('it') }} - {{ 'hello' | translate ('pt') }}",
                 configuration()
                         .extensions()
-                        .add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                .withMessageSourceFactory(new AggregatedLocalizedMessageSourceFactory(
-                                        new FileLocalizedResourceProvider(new File("src/test/resources/translation"), propertiesFile()),
-                                        new PropertiesLocalizedMessageResourceLoader(new FilenameLocaleExtractor(new JavaLocaleResolver(), new RetrieveLocaleExpressionFromFilename()))
-                                ))
+                        .add(new TranslateExtension(
+                                translateConfiguration()
+                                        .withMessageSourceFactory(propertiesMessageSource()
+                                                .withLookupDirectory("src/test/resources/translation")
+                                                .build())
+                                        .build()))
+                        .and()
+                        .build()
+        ).render(JtwigModel.newModel());
+
+        assertThat(result, is("Ciao - Ola"));
+    }
+
+    @Test
+    public void testClasspath() throws Exception {
+        String result = JtwigTemplate.inlineTemplate("{{ 'hello' | translate ('it') }} - {{ 'hello' | translate ('pt') }}",
+                configuration()
+                        .extensions()
+                        .add(new TranslateExtension(translateConfiguration()
+                                .withMessageSourceFactory(propertiesMessageSource()
+                                        .withLookupClasspath("translation")
+                                        .build())
                                 .build()))
                         .and()
                         .build()
@@ -87,8 +102,8 @@ public class PropertiesLoadingTest {
                         .extensions()
                         .add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
                                 .withMessageSourceFactory(new AggregatedLocalizedMessageSourceFactory(
-                                        new FileLocalizedResourceProvider(new File("src/test/resources/translation"), propertiesExtensionsFile()),
-                                        new PropertiesLocalizedMessageResourceLoader(new FilenameLocaleExtractor(new JavaLocaleResolver(), new RetrieveLocaleExpressionFromFilename()))
+                                        new FileLocalizedResourceProvider(new File("src/test/resources/translation"), propertiesExtensionsFile(), DirectoryFileFinder.directory()),
+                                        new PropertiesLocalizedMessageResourceLoader(new FilenameLocaleExtractor(RetrieveLocaleExpressionFromFilename.instance()))
                                 ))
                                 .build()))
                         .and()
@@ -105,9 +120,9 @@ public class PropertiesLoadingTest {
                                 .withMessageSourceFactory(new CachedMessageSourceFactory(
                                         new PersistentMessageSourceCache(new LocaleAndMessageFactory(), new ConcurrentHashMap<LocaleAndMessage, Optional<String>>())
                                         , new AggregatedLocalizedMessageSourceFactory(
-                                                new FileLocalizedResourceProvider(new File("src/test/resources/translation"), propertiesFile()),
-                                                new PropertiesLocalizedMessageResourceLoader(new FilenameLocaleExtractor(new JavaLocaleResolver(), new RetrieveLocaleExpressionFromFilename()))
-                                        )
+                                        new FileLocalizedResourceProvider(new File("src/test/resources/translation"), propertiesFile(), DirectoryFileFinder.directory()),
+                                        new PropertiesLocalizedMessageResourceLoader(new FilenameLocaleExtractor(RetrieveLocaleExpressionFromFilename.instance()))
+                                )
                                 ))
                                 .build()))
                         .and()
@@ -123,12 +138,13 @@ public class PropertiesLoadingTest {
         String result = JtwigTemplate.inlineTemplate("{{ 'hello' | translate ('it') }} - {{ 'hello' | translate ('it') }}",
                 configuration()
                         .extensions()
-                        .add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                .withMessageSourceFactory(new CachedMessageSourceFactory(
-                                        new GuavaMessageSourceCache(new LocaleAndMessageFactory(), new MessageProviderFactory(), cache)
-                                        , new AggregatedLocalizedMessageSourceFactory(
-                                                new FileLocalizedResourceProvider(new File("src/test/resources/translation"), propertiesFile()),
-                                                new PropertiesLocalizedMessageResourceLoader(new FilenameLocaleExtractor(new JavaLocaleResolver(), new RetrieveLocaleExpressionFromFilename()))
+                        .add(new TranslateExtension(translateConfiguration()
+                                .withMessageSourceFactory(CachedMessageSourceFactory.cachedWith(
+                                        GuavaMessageSourceCache.guavaCache(cache),
+                                        CompositeMessageSourceFactory.multiple(
+                                                propertiesMessageSource()
+                                                        .withLookupDirectory(new File("src/test/resources/translation"))
+                                                        .build()
                                         )
                                 ))
                                 .build()))
@@ -145,11 +161,10 @@ public class PropertiesLoadingTest {
         String result = JtwigTemplate.inlineTemplate("{{ 'hello' | translate ('fr') }} - {{ 'hello' | translate ('pt') }}",
                 configuration()
                         .extensions()
-                        .add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
-                                .withMessageSourceFactory(new AggregatedLocalizedMessageSourceFactory(
-                                        new CompositeLocalizedResourceProvider(Collections.<LocalizedResourceProvider>singletonList(new RecursiveFileLocalizedResourceProvider(new File("src/test/resources/translation"), propertiesFile()))),
-                                        new PropertiesLocalizedMessageResourceLoader(new FilenameLocaleExtractor(new JavaLocaleResolver(), new RetrieveLocaleExpressionFromFilename()))
-                                ))
+                        .add(new TranslateExtension(translateConfiguration()
+                                .withMessageSourceFactory(propertiesMessageSource()
+                                        .withLookupDirectoryRecursively("src/test/resources/translation")
+                                        .build())
                                 .build()))
                         .and()
                         .build()

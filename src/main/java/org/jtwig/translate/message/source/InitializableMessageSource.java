@@ -3,14 +3,15 @@ package org.jtwig.translate.message.source;
 import com.google.common.base.Optional;
 import org.jtwig.environment.Environment;
 import org.jtwig.environment.initializer.EnvironmentInitializer;
+import org.jtwig.translate.message.source.factory.MessageSourceFactory;
 
 import java.util.Locale;
 
-public class DefaultMessageSource implements MessageSource, EnvironmentInitializer {
+public class InitializableMessageSource implements MessageSource, EnvironmentInitializer {
     private final MessageSourceFactory messageSourceFactory;
     private MessageSource messageSource;
 
-    public DefaultMessageSource(MessageSourceFactory messageSourceFactory) {
+    public InitializableMessageSource(MessageSourceFactory messageSourceFactory) {
         this.messageSourceFactory = messageSourceFactory;
     }
 
