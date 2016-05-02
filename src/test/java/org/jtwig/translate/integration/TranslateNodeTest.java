@@ -65,6 +65,19 @@ public class TranslateNodeTest {
     }
 
     @Test
+    public void simpleTranslateWithTranslationIntoWith() throws Exception {
+        String result = JtwigTemplate.inlineTemplate("{% trans with {'%name%': 'Jtwig'} into 'it-IT' %}Hi{% endtrans %}", configuration()
+                .extensions().add(new TranslateExtension(new TranslateConfigurationBuilder(new DefaultTranslateConfiguration())
+                        .withMessageSourceFactory(singleEntry(Locale.ITALY, "Hi", "Ciao %name%"))
+                        .withCurrentLocaleSupplier(new StaticLocaleSupplier(Locale.ENGLISH))
+                        .build())).and()
+                .build())
+                .render(JtwigModel.newModel());
+
+        assertThat(result, is("Ciao Jtwig"));
+    }
+
+    @Test
     public void simpleTranslateWithTranslationIntoInvalid() throws Exception {
         expectedException.expectMessage(containsString("Unable to convert '1' to locale"));
 

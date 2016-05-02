@@ -15,7 +15,8 @@ public class DefaultMessageResolver implements MessageResolver {
 
     @Override
     public Optional<String> resolve(Locale locale, String message, MessageDecorator decorator) {
-        Optional<String> result = messageSource.message(locale, message);
+        String input = (message == null) ? null : message.trim();
+        Optional<String> result = messageSource.message(locale, input);
         if (result.isPresent()) {
             return Optional.fromNullable(decorator.decorate(result.get()));
         }
