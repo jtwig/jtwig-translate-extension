@@ -30,25 +30,26 @@ public class PropertiesMessageSourceFactoryBuilder implements Builder<MessageSou
     }
 
     public PropertiesMessageSourceFactoryBuilder withLookupDirectory (File directory) {
-        localizedResourceProviders.add(new FileLocalizedResourceProvider(directory, properties(), directory()));
-        return this;
+        return withResourceProvider(new FileLocalizedResourceProvider(directory, properties(), directory()));
     }
     public PropertiesMessageSourceFactoryBuilder withLookupDirectoryRecursively (String directory) {
         return withLookupDirectoryRecursively(new File(directory));
     }
 
     public PropertiesMessageSourceFactoryBuilder withLookupDirectoryRecursively (File directory) {
-        localizedResourceProviders.add(new FileLocalizedResourceProvider(directory, properties(), recursiveDirectory()));
-        return this;
+        return withResourceProvider(new FileLocalizedResourceProvider(directory, properties(), recursiveDirectory()));
     }
 
     public PropertiesMessageSourceFactoryBuilder withLookupClasspath (String basePackage) {
-        localizedResourceProviders.add(new ClasspathLocalizedResourceProvider(getClass().getClassLoader(), basePackage, properties(), directory()));
-        return this;
+        return withResourceProvider(new ClasspathLocalizedResourceProvider(getClass().getClassLoader(), basePackage, properties(), directory()));
     }
 
     public PropertiesMessageSourceFactoryBuilder withLookupClasspathRecursively (String basePackage) {
-        localizedResourceProviders.add(new ClasspathLocalizedResourceProvider(getClass().getClassLoader(), basePackage, properties(), recursiveDirectory()));
+        return withResourceProvider(new ClasspathLocalizedResourceProvider(getClass().getClassLoader(), basePackage, properties(), recursiveDirectory()));
+    }
+
+    public PropertiesMessageSourceFactoryBuilder withResourceProvider (LocalizedResourceProvider localizedResourceProvider) {
+        localizedResourceProviders.add(localizedResourceProvider);
         return this;
     }
 
