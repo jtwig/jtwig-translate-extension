@@ -3,6 +3,7 @@ package org.jtwig.translate.render.node;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import org.jtwig.environment.Environment;
+import org.jtwig.escape.EscapeEngine;
 import org.jtwig.exceptions.CalculationException;
 import org.jtwig.render.RenderRequest;
 import org.jtwig.render.node.renderer.NodeRender;
@@ -67,12 +68,12 @@ public class TranslateNodeRender implements NodeRender<TranslateNode> {
                 throw new CalculationException(ErrorMessageFormatter.errorMessage(node.getPosition(), String.format("Unable to convert '%s' to replacements", calculatedValue)));
             }
         }
-        decorators.add(new ExpressionMessageDecorator(fromContextValue(request.getRenderContext().getValueContext().getCurrent(), environment.getValueEnvironment())));
+        decorators.add(new ExpressionMessageDecorator(fromContextValue(request.getRenderContext().getCurrent(ValueContext.class), environment.getValueEnvironment())));
 
         CompositeMessageDecorator messageDecorator = new CompositeMessageDecorator(decorators);
         return new StringRenderable(TranslateExtension.enviroment(environment).getMessageResolver()
                 .resolve(locale, message, messageDecorator)
-                .or(defaultMessage(message, messageDecorator)), request.getRenderContext().getEscapeEngineContext().getCurrent());
+                .or(defaultMessage(message, messageDecorator)), request.getRenderContext().getCurrent(EscapeEngine.class));
     }
 
 
