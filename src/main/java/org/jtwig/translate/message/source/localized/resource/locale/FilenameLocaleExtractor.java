@@ -13,7 +13,7 @@ import java.util.Locale;
 /**
  * Filenames with the pattern name.locale.extension.
  * For example:
- * <p/>
+ *
  * - messages.en.properties
  * - test.pt.xml
  * - origin.fr.xliff
