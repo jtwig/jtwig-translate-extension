@@ -12,6 +12,7 @@ import org.jtwig.translate.message.source.localized.resource.PropertiesLocalized
 import org.jtwig.translate.message.source.localized.resource.locale.FilenameLocaleExtractor;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -31,7 +32,7 @@ public class PropertiesLocalizedMessageResourceLoader implements LocalizedMessag
         } else {
             Properties properties = new Properties();
             try {
-                properties.load(resourceMetadata.load());
+                properties.load(new InputStreamReader(resourceMetadata.load(), environment.getResourceEnvironment().getDefaultInputCharset()));
                 Optional<Locale> localeOptional = localeExtractor.extractLocale(environment, resourceMetadata);
                 if (!localeOptional.isPresent()) {
                     throw new ResourceException(String.format("Could not extract locale from resource '%s'", resourceReference));
