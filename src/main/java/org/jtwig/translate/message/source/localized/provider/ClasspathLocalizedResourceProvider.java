@@ -35,7 +35,8 @@ public class ClasspathLocalizedResourceProvider implements LocalizedResourceProv
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
                 if (FILE_PROTOCOL.contains(resource.getProtocol())) {
-                    File baseDirectory = new File(resource.getFile(), basePackage.replace(".", File.separator));
+                    final String path = URLDecoder.decode(resource.getFile(), "UTF-8");
+                    File baseDirectory = new File(path, basePackage.replace(".", File.separator));
                     Collection<File> files = fileFinder.find(baseDirectory, fileFilter);
                     for (File file : files) {
                         result.add(ResourceReference.file(file));
@@ -44,6 +45,8 @@ public class ClasspathLocalizedResourceProvider implements LocalizedResourceProv
             }
         } catch (IOException e) {
             throw new ResourceException("Cannot load classpath root directories", e);
+        } catch (UnsupportedEncodingException e){
+            throw new ResourceException("Cannot decode classpath root directories", e);
         }
         return result;
     }
